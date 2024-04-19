@@ -35,8 +35,7 @@ public class Main {
                         GatewayIntent.DIRECT_MESSAGES
                 )
                 .enableCache(
-                        CacheFlag.MEMBER_OVERRIDES,
-                        CacheFlag.VOICE_STATE
+                        CacheFlag.MEMBER_OVERRIDES
                 );
 
         shardManager = builder.build();
