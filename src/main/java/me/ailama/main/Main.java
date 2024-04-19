@@ -31,12 +31,7 @@ public class Main {
 
                 .setEnabledIntents(
                         GatewayIntent.GUILD_MEMBERS,
-                        GatewayIntent.SCHEDULED_EVENTS,
-                        GatewayIntent.GUILD_MODERATION,
-                        GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
-                        GatewayIntent.GUILD_INVITES,
-                        GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                        GatewayIntent.GUILD_VOICE_STATES,
+                        GatewayIntent.GUILD_MESSAGES,
                         GatewayIntent.DIRECT_MESSAGES
                 )
                 .enableCache(
