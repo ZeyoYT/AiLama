@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    image: ailama:latest
+    environment:
+      - TOKEN=<YOUR_BOT_TOKEN>
+      - OLLAMA_URL=<YOUR_OLLAMA_URL>
+      - OLLAMA_PORT=<YOUR_OLLAMA_PORT>
+      - OLLAMA_MODEL=<YOUR_OLLAMA_MODEL>
+      - OLLAMA_EMBEDDING_MODEL=<YOUR_OLLAMA_EMBEDDING_MODEL>
+      - DEV_ID=<YOUR_DISCORD_ID>
+      # Write inside single quotes and the user ids separated by commas, if you dont want to use this feature, just write '' (empty string enclosed by single quotes)
+      - WHITELISTED_USERS='<user_id1>,<user_id2>,<user_id3> ... <user_idN>'

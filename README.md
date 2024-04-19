@@ -110,6 +110,8 @@ WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 4. This project uses a unreleased feature of JDA-5 that Supports User Installable Apps
 5. Because its a unreleased feature, i didnt find any proper command framework, so a workaround manual command registration code was used ( will be fixed in future release )
 6. The Ai does not have a memory of previous conversation (would be added in future)
+7. Its my first time making a docker image, so there might be some issues with it
+8. First Response might be slow because of the model loading 
 
 <br>
 
@@ -122,7 +124,77 @@ WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 
 <br>
 
-## Command Example :
+## Run Using Docker 
+
+_Docker Image is Available at [Docker Hub](https://hub.docker.com/r/zeyoog/ailama)_
+
+<br>
+
+### Using Docker Compose :-
+#### Docker Compose File :
+```yaml
+version: '3.8'
+
+services:
+  app:
+    image: ailama:latest
+    environment:
+      - TOKEN=<YOUR_BOT_TOKEN>
+      - OLLAMA_URL=<YOUR_OLLAMA_URL>
+      - OLLAMA_PORT=<YOUR_OLLAMA_PORT>
+      - OLLAMA_MODEL=<YOUR_OLLAMA_MODEL>
+      - OLLAMA_EMBEDDING_MODEL=<YOUR_OLLAMA_EMBEDDING_MODEL>
+      - DEV_ID=<YOUR_DISCORD_ID>
+      # Write inside single quotes and the user ids separated by commas, if you dont want to use this feature, just write '' (empty string enclosed by single quotes)
+      - WHITELISTED_USERS='<user_id1>,<user_id2>,<user_id3> ... <user_idN>'
+```
+#### Run Command :
+```
+docker-compose up -d
+```
+
+<br>
+
+### Manual Method :-
+
+#### Pull Command :
+```
+docker pull zeyoog/ailama
+```
+
+#### Run Command :
+```
+docker run -e "TOKEN=<bot token>" -e OLLAMA_URL=<ollama_host_url> -e OLLAMA_PORT=<ollama_port> -e OLLAMA_MODEL=<ollama_model> -e OLLAMA_EMBEDDING_MODEL=<ollama_embedding_model> -e DEV_ID=<developer_id> -e "WHITELISTED_USERS='<whitelisted_user_id>, <whitelisted_user_id>'" ailama:latest
+```
+
+<br>
+
+## Build Docker Image Your self
+
+_After Building you can also use the docker compose to run the bot_
+
+<br>
+
+__1. Clone Repo and Change Directory :__
+```
+git clone https://github.com/zeyoyt/AiLama.git
+
+cd AiLama
+```
+
+__2. Run Docker Build Command :__
+```
+docker build -t ailama:latest .
+```
+
+__3. Run Docker Container :__
+```
+docker run -e "TOKEN=<bot token>" -e OLLAMA_URL=<ollama_host_url> -e OLLAMA_PORT=<ollama_port> -e OLLAMA_MODEL=<ollama_model> -e OLLAMA_EMBEDDING_MODEL=<ollama_embedding_model> -e DEV_ID=<developer_id> -e "WHITELISTED_USERS='<whitelisted_user_id>, <whitelisted_user_id>'" ailama:latest
+```
+
+<br>
+
+## Command Example
 
 ### Ask a Query :-
 ```
