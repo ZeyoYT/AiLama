@@ -109,6 +109,7 @@ WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 3. Code Quality is Low because i am still new with Ai and Lang Chain
 4. This project uses a unreleased feature of JDA-5 that Supports User Installable Apps
 5. Because its a unreleased feature, i didnt find any proper command framework, so a workaround manual command registration code was used ( will be fixed in future release )
+6. The Ai does not have a memory of previous conversation (would be added in future)
 
 <br>
 
@@ -117,6 +118,7 @@ WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 1. The Response will varay from model to model
 2. URL RAG might not work with smaller models that support less context window
 3. Only supports Ollama right now
+4. No Memory for previous conversations
 
 <br>
 
