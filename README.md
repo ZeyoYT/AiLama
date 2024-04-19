@@ -3,7 +3,7 @@
 A User Installable Discord App, made using JDA-5 ( java discord api 5 ), LangChain4J, and using Ollama to provide Ai Response anywhere in discord
 <br>
 <br>
-Please Read : [Important Things to Consider](https://github.com/ZeyoYT/AiLama/new/master?filename=README.md#important-things-to-consider-before-using-the-project)
+Please Read : [Important Things to Consider](https://github.com/ZeyoYT/AiLama/tree/master?tab=readme-ov-file#important-things-to-consider-before-using-the-project)
 
 <br>
 
