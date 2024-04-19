@@ -22,7 +22,7 @@ public class Main {
         DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.createDefault(Config.getToken("TOKEN"))
                 .setActivity(Activity.watching("User"))
                 .setAutoReconnect(true)
-                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .setMemberCachePolicy(MemberCachePolicy.DEFAULT)
 
                 .addEventListeners(
                         new JDAReady(),
@@ -32,11 +32,18 @@ public class Main {
                 .setEnabledIntents(
                         GatewayIntent.GUILD_MEMBERS,
                         GatewayIntent.GUILD_MESSAGES,
-                        GatewayIntent.DIRECT_MESSAGES
+                        GatewayIntent.DIRECT_MESSAGES,
+                        GatewayIntent.GUILD_VOICE_STATES,
+                        GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                        GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
+                        GatewayIntent.SCHEDULED_EVENTS
                 )
+
                 .enableCache(
+                        CacheFlag.VOICE_STATE,
                         CacheFlag.MEMBER_OVERRIDES,
-                        CacheFlag.VOICE_STATE
+                        CacheFlag.SCHEDULED_EVENTS,
+                        CacheFlag.EMOJI
                 );
 
         shardManager = builder.build();

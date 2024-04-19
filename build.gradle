@@ -6,7 +6,7 @@ plugins {
 
 mainClassName = 'me.ailama.main.Main'
 group = 'me.ailama'
-version = '1.0-SNAPSHOT'
+version = '1.0'
 assemble.dependsOn(shadowJar)
 
 targetCompatibility = 19
