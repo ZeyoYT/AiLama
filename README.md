@@ -59,7 +59,7 @@ java -jar ./<jar file name here>.jar
 
 <br>
 
-## How to Make a new Discord App
+## How to Make a new Discord Installable App and Install it
 
 1. Go to `https://discord.com/developers/applications`
 2. Click 'New Application' button
