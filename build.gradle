@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+mainClassName = 'me.ailama.main.Main'
+group = 'me.ailama'
+version = '1.0-SNAPSHOT'
+assemble.dependsOn(shadowJar)
+
+targetCompatibility = 19
+sourceCompatibility = 19
+
+shadowJar{
+    destinationDirectory.set(new File(projectDir,"./build/shadow"))
+    from { file(".env") }
+}
+
+repositories {
+    mavenCentral()
+
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+
+    maven {
+        name 'm2-duncte123'
+        url 'https://m2.duncte123.dev/releases'
+    }
+
+    maven {
+        url "https://m2.chew.pro/snapshots"
+    }
+
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+
+dependencies {
+
+    implementation group: 'io.github.freya022', name: 'JDA', version: 'f2d4e9d545'
+    implementation group: 'io.github.cdimascio', name: 'java-dotenv', version: '5.2.2'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.2'
+    implementation group: 'dev.langchain4j', name: 'langchain4j-ollama', version: '0.30.0'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+
+    implementation 'dev.langchain4j:langchain4j-easy-rag:0.30.0'
+
+
+}
