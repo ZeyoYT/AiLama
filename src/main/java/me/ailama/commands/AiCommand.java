@@ -62,6 +62,7 @@ public class AiCommand {
         String[] whitelistArray = whitelist.split(", ");
 
         List<String> whitelistedUsers = Arrays.asList(whitelistArray);
+        whitelistedUsers.add(Config.get("DEV_ID"));
 
         if(!whitelistedUsers.contains(event.getUser().getId())) {
             event.reply("You are not allowed to use this command. its only made for " + event.getJDA().getUserById(Config.get("DEV_ID")).getAsMention() + "or a select few whitelisted people").setEphemeral(true).queue();
