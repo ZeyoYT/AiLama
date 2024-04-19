@@ -57,8 +57,6 @@ public class AiCommand {
 
     public void handleCommand(SlashCommandInteractionEvent event) {
 
-        System.out.println(Config.get("WHITELISTED_USERS"));
-
         String whitelist = Config.get("WHITELISTED_USERS");
         whitelist = whitelist.substring(1, whitelist.length() - 1);
         String[] whitelistArray = whitelist.split(", ");
@@ -70,7 +68,12 @@ public class AiCommand {
             return;
         }
 
-        event.deferReply().queue();
+        if(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()) {
+            event.deferReply(true).queue();
+        }
+        else {
+            event.deferReply().queue();
+        }
 
         String model = event.getOption("model") != null ? event.getOption("model").getAsString() : Config.get("OLLAMA_MODEL");
         String embModel = Config.get("OLLAMA_EMBEDDING_MODEL");
@@ -120,8 +123,8 @@ public class AiCommand {
             List<String> responses = AiLama.getInstance().getParts(response, 2000);
             for(String res : responses) {
 
-                if(event.getOption("empherial") != null && event.getOption("ephemeral").getAsBoolean()) {
-                    event.getHook().sendMessage(res).setEphemeral(true).queue();
+                if(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()) {
+                    event.getHook().sendMessage(response).setEphemeral(true).queue();
                     continue;
                 }
 

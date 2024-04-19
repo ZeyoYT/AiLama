@@ -1,16 +1,9 @@
 package me.ailama.main;
 
 import me.ailama.autoevents.commandhandler.HandleCommand;
-import me.ailama.autoevents.jdaevents.ButtonEvent;
 import me.ailama.autoevents.jdaevents.JDAReady;
-import me.ailama.autoevents.jdaevents.MenuEvent;
-import me.ailama.autoevents.jdaevents.ModalEvent;
 import me.ailama.config.Config;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.interactions.IntegrationType;
-import net.dv8tion.jda.api.interactions.InteractionContextType;
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -33,12 +26,7 @@ public class Main {
 
                 .addEventListeners(
                         new JDAReady(),
-
-                        new HandleCommand(),
-
-                        new ModalEvent(),
-                        new MenuEvent(),
-                        new ButtonEvent()
+                        new HandleCommand()
                 )
 
                 .setEnabledIntents(
