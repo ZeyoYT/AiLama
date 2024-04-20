@@ -1,5 +1,5 @@
 # Use a base image with Java 19 installed
-FROM openjdk:19-jdk AS build
+FROM amazoncorretto:21.0.3 AS build
 
 # Copy the source code to the container
 COPY . /app
@@ -25,7 +25,7 @@ ENV OLLAMA_EMBEDDING_MODEL=${OLLAMA_EMBEDDING_MODEL:-embedding_model}
 ARG DEV_ID
 ENV DEV_ID=${DEV_ID:-your_discord_user_id}
 ARG WHITELISTED_USERS
-ENV WHITELISTED_USERS=${WHITELISTED_USERS:-user_id_1,user_id_2,...}
+ENV WHITELISTED_USERS=${WHITELISTED_USERS}
 
 # Check if any required environment variables are missing
 RUN test -n "$TOKEN" && \
@@ -33,8 +33,7 @@ RUN test -n "$TOKEN" && \
     test -n "$OLLAMA_PORT" && \
     test -n "$OLLAMA_MODEL" && \
     test -n "$OLLAMA_EMBEDDING_MODEL" && \
-    test -n "$DEV_ID" && \
-    test -n "$WHITELISTED_USERS" || \
+    test -n "$DEV_ID" || \
     { echo "One or more required environment variables are missing."; exit 1; }
 
 RUN echo "TOKEN=$TOKEN" > .env \
@@ -42,8 +41,23 @@ RUN echo "TOKEN=$TOKEN" > .env \
     && echo "OLLAMA_PORT=$OLLAMA_PORT" >> .env \
     && echo "OLLAMA_MODEL=$OLLAMA_MODEL" >> .env \
     && echo "OLLAMA_EMBEDDING_MODEL=$OLLAMA_EMBEDDING_MODEL" >> .env \
-    && echo "DEV_ID=$DEV_ID" >> .env \
-    && echo "WHITELISTED_USERS=$WHITELISTED_USERS" >> .env
+    && echo "DEV_ID=$DEV_ID" >> .env
+
+# Add WHITELISTED_USERS to .env if provided
+RUN if [ -n "$WHITELISTED_USERS" ]; then echo "WHITELISTED_USERS=$WHITELISTED_USERS" >> .env; fi
+
+# Ask for SearXNG URL , PORT and ENGINES and dont add if not provided
+ARG SEARXNG_URL
+ENV SEARXNG_URL=${SEARXNG_URL}
+ARG SEARXNG_PORT
+ENV SEARXNG_PORT=${SEARXNG_PORT}
+ARG SEARXNG_ENGINES
+ENV SEARXNG_ENGINES=${SEARXNG_ENGINES}
+
+# add searxng to .env if provided
+RUN if [ -n "$SEARXNG_URL" ]; then echo "SEARXNG_URL=$SEARXNG_URL" >> .env; fi
+RUN if [ -n "$SEARXNG_PORT" ]; then echo "SEARXNG_PORT=$SEARXNG_PORT" >> .env; fi
+RUN if [ -n "$SEARXNG_ENGINES" ]; then echo "SEARXNG_ENGINES=$SEARXNG_ENGINES" >> .env; fi
 
 # Build the application using Gradle
 RUN sed -i 's/\r$//' ./gradlew
@@ -51,7 +65,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew build
 
 # Use a base image with Java 19 installed
-FROM openjdk:19-jdk
+FROM amazoncorretto:21.0.3
 
 # Set the working directory in the container
 WORKDIR /app

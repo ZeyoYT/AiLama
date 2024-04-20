@@ -1,36 +1,28 @@
 package me.ailama.commands;
 
 import dev.langchain4j.data.document.Document;
-import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.loader.UrlDocumentLoader;
 import dev.langchain4j.data.document.parser.TextDocumentParser;
-import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.document.transformer.HtmlTextExtractor;
-import dev.langchain4j.data.embedding.Embedding;
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.ollama.OllamaChatModel;
-import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
-import dev.langchain4j.rag.content.retriever.ContentRetriever;
-import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
-import dev.langchain4j.service.AiServices;
-import dev.langchain4j.store.embedding.EmbeddingStore;
-import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
-import me.ailama.config.Config;
-import me.ailama.handler.other.Assistant;
+import me.ailama.handler.commandhandler.OllamaManager;
+import me.ailama.handler.commandhandler.SearXNGManager;
+import me.ailama.handler.interfaces.AiLamaSlashCommand;
+import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.IntegrationType;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-public class AiCommand {
+public class AiCommand implements AiLamaSlashCommand {
 
     public SlashCommandData getCommandData() {
         return Commands.slash("ai","ask ai (ollama)")
@@ -39,6 +31,7 @@ public class AiCommand {
                 .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
 
                 .addOption(OptionType.STRING, "ask", "The query you want to ask", true)
+                .addOption(OptionType.BOOLEAN, "web", "If you want the response based on web search", false)
                 .addOption(OptionType.STRING, "model", "Example (gemma:2b)", false)
                 .addOption(OptionType.BOOLEAN, "ephemeral", "If you want the response to be ephemeral", false)
                 .addOption(OptionType.STRING, "url", "The Url of website for RAG", false)
@@ -48,6 +41,7 @@ public class AiCommand {
 
     public void handleCommand(SlashCommandInteractionEvent event) {
 
+        // Defer the reply to avoid timeout and set ephemeral if the option is provided
         if(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()) {
             event.deferReply(true).queue();
         }
@@ -55,94 +49,98 @@ public class AiCommand {
             event.deferReply().queue();
         }
 
-        String model = event.getOption("model") != null ? event.getOption("model").getAsString() : Config.get("OLLAMA_MODEL");
-        String embModel = Config.get("OLLAMA_EMBEDDING_MODEL");
-        String url = "http://" + Config.get("OLLAMA_URL") + ":" + Config.get("OLLAMA_PORT");
-        String query = event.getOption("ask").getAsString();
+        // Set Configurations
+        String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
+        String queryOption = event.getOption("ask").getAsString();
+        String urlOption = event.getOption("url") != null ? event.getOption("url").getAsString() : null;
+
         String response = "";
-        boolean urlLoaded = false;
+        String urlForContent = null;
 
+        // Check if the web option and url option are provided at the same time
+        if(event.getOption("web") != null && event.getOption("web").getAsBoolean() && urlOption != null) {
+            event.getHook().sendMessage("You can only provide one of web or url").setEphemeral(true).queue();
+            return;
+        }
 
-        if(event.getOption("url") != null) {
+        // if the web option is provided, get the url from the search
+        if(event.getOption("web") != null && event.getOption("web").getAsBoolean()) {
 
-            try {
-                URL webUrl = new URL(AiLama.getInstance().fixUrl(event.getOption("url").getAsString()));
+            urlForContent = SearXNGManager.getInstance().getUrlFromSearch(queryOption);
 
-                Document htmlDoc = UrlDocumentLoader.load(webUrl, new TextDocumentParser());
-                HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
-                Document document = transformer.transform(htmlDoc);
-
-                Assistant assistant = createAssistant(document, model, embModel, url);
-                response = assistant.answer(query);
-
-                urlLoaded = true;
-            }
-            catch (Exception e) {
-                event.getHook().sendMessage("Invalid URL").setEphemeral(true).queue();
+            if(urlForContent == null) {
+                event.getHook().sendMessage("No proper results were found").setEphemeral(true).queue();
                 return;
             }
 
         }
 
-        try {
-            if(!urlLoaded) {
-                OllamaChatModel.OllamaChatModelBuilder ollama = OllamaChatModel.builder().baseUrl(url).modelName(model).temperature(8.0);
-                response = ollama.build().generate(query);
+        if(urlOption != null || urlForContent != null) {
+            // if the url option is provided or the web option is provided, ask the assistant to answer the query based on the url
+            Assistant assistant = urlAssistant(urlForContent, urlOption, modelOption);
+
+            if(assistant != null) {
+                response = Optional.ofNullable(assistant.answer(queryOption)).orElse("Web search failed");
             }
         }
-        catch (Exception e) {
-            response = "I'm sorry, I'm having trouble processing your request. did you provide the correct model?";
+        else
+        {
+            // generate normal response based on the query if the url option is not provided or the web option is not provided
+            response = OllamaManager.getInstance().createAssistant(modelOption).answer(queryOption);
         }
+
 
         if(response == null || response.isEmpty()) {
-            response = "I'm sorry, I don't understand what you're saying.";
+            response = "I'm sorry, I don't understand what you're saying. did you provide the correct options?";
         }
 
-        // if response is longer then 2000 characters, split it into multiple messages
         if(response.length() > 2000) {
             List<String> responses = AiLama.getInstance().getParts(response, 2000);
+
             for(String res : responses) {
-
-                if(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()) {
-                    event.getHook().sendMessage(response).setEphemeral(true).queue();
-                    continue;
-                }
-
-                event.getHook().sendMessage(res).queue();
+                sendMessage(event, res);
             }
+
             return;
         }
 
+        sendMessage(event, response);
+    }
+
+    public void sendMessage(SlashCommandInteractionEvent event, String response) {
         if(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()) {
             event.getHook().sendMessage(response).setEphemeral(true).queue();
-            return;
         }
-
-        event.getHook().sendMessage(response).queue();
+        else
+        {
+            event.getHook().sendMessage(response).queue();
+        }
     }
 
-    public Assistant createAssistant(Document document, String model, String embModel, String url) {
-        DocumentSplitter splitter = DocumentSplitters.recursive(500, 0);
-        List<TextSegment> segments = splitter.split(document);
+    public Assistant urlAssistant(String urlForContent, String url, String model) {
+        try {
+            URL webUrl = null;
 
-        OllamaEmbeddingModel embeddingModel = OllamaEmbeddingModel.builder().baseUrl(url).modelName(embModel).build();
-        List<Embedding> embeddings = embeddingModel.embedAll(segments).content();
+            if(urlForContent != null) {
+                webUrl = new URL(urlForContent);
+            }
+            else {
+                webUrl = new URL(AiLama.getInstance().fixUrl(url));
+            }
 
-        EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-        embeddingStore.addAll(embeddings, segments);
+            Document htmlDoc = UrlDocumentLoader.load(webUrl, new TextDocumentParser());
+            HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
+            Document document = transformer.transform(htmlDoc);
 
-        ContentRetriever contentRetriever = EmbeddingStoreContentRetriever.builder()
-                .embeddingStore(embeddingStore)
-                .embeddingModel(embeddingModel)
-                .maxResults(2) // on each interaction we will retrieve the 2 most relevant segments
-                .minScore(0.5) // we want to retrieve segments at least somewhat similar to user query
-                .build();
+            return OllamaManager.getInstance().createAssistant(document, model);
+        }
+        catch (Exception e) {
 
-        OllamaChatModel ollama = OllamaChatModel.builder().baseUrl(url).modelName(model).temperature(8.0).build();
+            SearXNGManager.getInstance().addForbiddenUrl(urlForContent, e.getMessage());
 
-        return AiServices.builder(Assistant.class)
-                .chatLanguageModel(ollama)
-                .contentRetriever(contentRetriever)
-                .build();
+            return null;
+        }
     }
+
+
 }

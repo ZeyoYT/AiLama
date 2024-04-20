@@ -10,6 +10,8 @@ Please Read : [Important Things to Consider](https://github.com/ZeyoYT/AiLama/tr
 ## Features
 
 - Simple To Use
+- Web Search Capabilities using SearXNG
+- Web Document for RAG Support using URL
 - can be used anywhere in discord where user installable apps are supported
 - you can run you query by a different model on the fly using the model's field ( example below )
 - URL RAG supported, where you can provide a url in the URL Option and the bot will take the Website as a context
@@ -22,6 +24,7 @@ Please Read : [Important Things to Consider](https://github.com/ZeyoYT/AiLama/tr
 - Java 19 or Greater
 - Gradle 7.6 or Greater ( [Download Here](https://gradle.org/) )
 - A Discord App ( make __[New](https://discord.com/developers/applications)__ app from discord developer portal )
+- Optional : SearXNG for Web Search ( [Setup Here](https://github.com/searxng/searxng?tab=readme-ov-file#setup) ) ( [AiLama Guide Here](https://github.com/ZeyoYT/AiLama/tree/master?tab=readme-ov-file#SearXNG-Guide) )
 
 <br>
 
@@ -75,7 +78,7 @@ java -jar ./<jar file name here>.jar
 <br>
 <br>
 
-## White-Listing Other People to use the App
+## Whitelisting Other People to use the App
 
 <br>
 
@@ -85,14 +88,14 @@ _Using the Authorization Link, you can allow others to install the app, but to a
 
 In the Dot Env File ( .env ), there is a field called `WHITELISTED_USERS`, it must be shown something like this
 
-```
+```dotenv
 WHITELISTED_USERS='WHITELISTED_USER_ID_HERE, WHITELISTED_USER_ID_HERE, ...'
 ```
 
 <br>
 
 in this you need to add there User ID's inside a single quote seperated by coma ( , ), for Example
-```
+```dotenv
 WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 ```
 
@@ -111,7 +114,7 @@ WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 5. Because its a unreleased feature, i didnt find any proper command framework, so a workaround manual command registration code was used ( will be fixed in future release )
 6. The Ai does not have a memory of previous conversation (would be added in future)
 7. Its my first time making a docker image, so there might be some issues with it
-8. First Response might be slow because of the model loading 
+8. First Response might be slow because of the model loading
 
 <br>
 
@@ -145,8 +148,12 @@ services:
       - OLLAMA_MODEL=<YOUR_OLLAMA_MODEL>
       - OLLAMA_EMBEDDING_MODEL=<YOUR_OLLAMA_EMBEDDING_MODEL>
       - DEV_ID=<YOUR_DISCORD_ID>
+      # Optional Parameters :-
       # Write inside single quotes and the user ids separated by commas, if you dont want to use this feature, just write '' (empty string enclosed by single quotes)
       - WHITELISTED_USERS='<user_id1>,<user_id2>,<user_id3> ... <user_idN>'
+      - SEARXNG_URL=<YOUR_SEARXNG_URL>
+      - SEARXNG_PORT=<YOUR_SEARXNG_PORT>
+      - SEARXNG_ENGINES=<YOUR_SEARXNG_ENGINES>
 ```
 #### Run Command :
 ```
@@ -191,6 +198,44 @@ __3. Run Docker Container :__
 ```
 docker run -e "TOKEN=<bot token>" -e OLLAMA_URL=<ollama_host_url> -e OLLAMA_PORT=<ollama_port> -e OLLAMA_MODEL=<ollama_model> -e OLLAMA_EMBEDDING_MODEL=<ollama_embedding_model> -e DEV_ID=<developer_id> -e "WHITELISTED_USERS='<whitelisted_user_id>, <whitelisted_user_id>'" ailama:latest
 ```
+
+<br>
+
+## SearXNG Guide
+
+_WARNING :- Using SearXNG you are scrapping results of different search engines and it might get you blocked from that search engine as its against there **TOS**_
+
+<br>
+
+### Setting SearXNG :-
+
+1. First Install SearXNG ( [Setup Here](https://github.com/searxng/searxng?tab=readme-ov-file#setup) )
+2. After Setting SearXNG, Open the `settings.yml` file ( [Guide Here](https://docs.searxng.org/admin/settings/index.html) )
+3. Find ` Search: ` ( [Guide Here](https://docs.searxng.org/admin/settings/settings_search.html) )
+4. Add ` json ` to ` Formats ` like :-
+
+```yaml
+# In settings.yml
+
+search:
+  formats:
+    - html
+    - json
+```
+<br>
+
+### Adding Environment Variables to AiLama :-
+
+1. Add the Following Environment Variables to the `.env` file
+
+```dotenv
+SEARXNG_URL=<SEARXNG_HOST_URL>
+SEARXNG_PORT=<SEARXNG_PORT>
+SEARXNG_ENGINES=<SEARXNG_ENGINES>
+```
+
+2. Restart the Bot and Now you can use the Web Search FeatureS='SEARCH_ENGINE_HERE, SEARCH_ENGINE_HERE, ...'
+
 
 <br>
 
