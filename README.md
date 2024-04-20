@@ -3,7 +3,36 @@
 A User Installable Discord App, made using JDA-5 ( java discord api 5 ), LangChain4J, and using Ollama to provide Ai Response anywhere in discord
 <br>
 <br>
-Please Read : [Important Things to Consider](https://github.com/ZeyoYT/AiLama/tree/master?tab=readme-ov-file#important-things-to-consider-before-using-the-project)
+Please Read : [Important Things to Consider](#important-things-to-consider-before-using-the-project)
+
+<br>
+
+## Table of Contents
+
+- [Features](#features)
+- [Prerequisite](#prerequisite)
+- [How-To](#how-to)
+- [Whitelisting Other People to use the App](#whitelisting-other-people-to-use-the-app)
+- [Important Things to Consider before Using the Project](#important-things-to-consider-before-using-the-project)
+- [Limitations](#limitations)
+- [Run Using Docker](#run-using-docker)
+    - [Using Docker Compose](#using-docker-compose)
+    - [Manual Method](#manual-method)
+- [Build Docker Image Your self](#build-docker-image-your-self)
+- [SearXNG Guide](#searxng-guide)
+    - [Setting SearXNG](#setting-searxng)
+    - [Adding Environment Variables to AiLama](#adding-environment-variables-to-ailama)
+- [Command Example](#command-example)
+    - [Ask a Query](#ask-a-query)
+    - [Asking Different Model on the Fly](#asking-different-model-on-the-fly)
+    - [Asking Query in a User only Visible Message](#asking-query-in-a-user-only-visible-message)
+    - [Asking Query and Providing a Website URL For Context](#asking-query-and-providing-a-website-url-for-context)
+- [Docker Image](https://hub.docker.com/r/zeyoog/ailama)
+- [Docker Compose File](#using-docker-compose)
+- [Manual Docker Run](#manual-method)
+- [Docker Build](#build-docker-image-your-self)
+- [SearXNG Guide](#searxng-guide)
+- [Command Example](#command-example)
 
 <br>
 
@@ -24,7 +53,7 @@ Please Read : [Important Things to Consider](https://github.com/ZeyoYT/AiLama/tr
 - Java 19 or Greater
 - Gradle 7.6 or Greater ( [Download Here](https://gradle.org/) )
 - A Discord App ( make __[New](https://discord.com/developers/applications)__ app from discord developer portal )
-- Optional : SearXNG for Web Search ( [Setup Here](https://github.com/searxng/searxng?tab=readme-ov-file#setup) ) ( [AiLama Guide Here](https://github.com/ZeyoYT/AiLama/tree/master?tab=readme-ov-file#SearXNG-Guide) )
+- Optional : SearXNG for Web Search ( [Setup Here](https://github.com/searxng/searxng?tab=readme-ov-file#setup) ) ( [AiLama Guide Here](#searxng-guide) )
 
 <br>
 
@@ -286,4 +315,16 @@ Example :-
 Example :-
 ```
 /ai ask:Why is the Sky Blue url:https://www.space.com/why-is-the-sky-blue
+```
+
+<br>
+
+### Asking Query using Web Search ( Requires SearXNG ) :-
+```
+/ai ask: <query> web: <Options : True | False>
+```
+
+Example :-
+```
+/ai ask:What is the Time web:True
 ```
