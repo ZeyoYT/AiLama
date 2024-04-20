@@ -15,7 +15,7 @@ Please Read : [Important Things to Consider](#important-things-to-consider-befor
 - [Whitelisting Other People to use the App](#whitelisting-other-people-to-use-the-app)
 - [Important Things to Consider before Using the Project](#important-things-to-consider-before-using-the-project)
 - [Limitations](#limitations)
-- [Run Using Docker](#run-using-docker-)
+- [Run Using Docker](#run-using-docker)
     - [Using Docker Compose](#docker-compose-file-)
     - [Manual Method](#manual-method--)
 - [Build Docker Image Your self](#build-docker-image-your-self)
@@ -25,7 +25,7 @@ Please Read : [Important Things to Consider](#important-things-to-consider-befor
 - [Command Example](#command-example)
     - [Ask a Query](#ask-a-query--)
     - [Asking Different Model on the Fly](#asking-different-model-on-the-fly--)
-    - [Asking Query in a User only Visible Message](#asking-query-in-a-user-only-visible-message-br--the-command-would-be-visible-to-the-user-who-executed-it---)
+    - [Asking Query in a User only Visible Message](#asking-query-in-a-user-only-visible-message---the-command-would-be-visible-to-the-user-who-executed-it---)
     - [Asking Query and Providing a Website URL For Context](#asking-query-and-providing-a-website-url-for-context--)
 
 <br>
