@@ -15,24 +15,18 @@ Please Read : [Important Things to Consider](#important-things-to-consider-befor
 - [Whitelisting Other People to use the App](#whitelisting-other-people-to-use-the-app)
 - [Important Things to Consider before Using the Project](#important-things-to-consider-before-using-the-project)
 - [Limitations](#limitations)
-- [Run Using Docker](#run-using-docker)
-    - [Using Docker Compose](#using-docker-compose)
-    - [Manual Method](#manual-method)
+- [Run Using Docker](#run-using-docker-)
+    - [Using Docker Compose](#docker-compose-file-)
+    - [Manual Method](#manual-method--)
 - [Build Docker Image Your self](#build-docker-image-your-self)
 - [SearXNG Guide](#searxng-guide)
-    - [Setting SearXNG](#setting-searxng)
-    - [Adding Environment Variables to AiLama](#adding-environment-variables-to-ailama)
+    - [Setting SearXNG](#setting-searxng--)
+    - [Adding Environment Variables to AiLama](#adding-environment-variables-to-ailama--)
 - [Command Example](#command-example)
-    - [Ask a Query](#ask-a-query)
-    - [Asking Different Model on the Fly](#asking-different-model-on-the-fly)
-    - [Asking Query in a User only Visible Message](#asking-query-in-a-user-only-visible-message)
-    - [Asking Query and Providing a Website URL For Context](#asking-query-and-providing-a-website-url-for-context)
-- [Docker Image](https://hub.docker.com/r/zeyoog/ailama)
-- [Docker Compose File](#using-docker-compose)
-- [Manual Docker Run](#manual-method)
-- [Docker Build](#build-docker-image-your-self)
-- [SearXNG Guide](#searxng-guide)
-- [Command Example](#command-example)
+    - [Ask a Query](#ask-a-query--)
+    - [Asking Different Model on the Fly](#asking-different-model-on-the-fly--)
+    - [Asking Query in a User only Visible Message](#asking-query-in-a-user-only-visible-message-br--the-command-would-be-visible-to-the-user-who-executed-it---)
+    - [Asking Query and Providing a Website URL For Context](#asking-query-and-providing-a-website-url-for-context--)
 
 <br>
 
@@ -147,7 +141,7 @@ WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 
 <br>
 
-## Limitations 
+## Limitations
 
 1. The Response will varay from model to model
 2. URL RAG might not work with smaller models that support less context window
