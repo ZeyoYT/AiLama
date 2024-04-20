@@ -1,17 +1,9 @@
 package me.ailama.autoevents.jdaevents;
 
-import me.ailama.commands.AiCommand;
+import me.ailama.handler.commandhandler.CommandRegister;
 import me.ailama.main.Main;
-import me.ailama.main.AiLama;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.IntegrationType;
-import net.dv8tion.jda.api.interactions.InteractionContextType;
-import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.slf4j.Logger;
 
 import java.time.LocalDateTime;
@@ -32,8 +24,6 @@ public class JDAReady extends ListenerAdapter {
         LOGGER.info("Guild UnAvailable : " + event.getGuildUnavailableCount());
         System.out.println();
 
-        event.getJDA().updateCommands().addCommands(
-                new AiCommand().getCommandData()
-        ).queue();
+        event.getJDA().updateCommands().addCommands(CommandRegister.getInstance().getCommandsSlashData()).queue();
     }
 }

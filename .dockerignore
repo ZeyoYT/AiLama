@@ -1,0 +1,7 @@
+/build
+/.idea
+/.gradle
+/.env.example
+/.env
+/.gitignore
+/README.md

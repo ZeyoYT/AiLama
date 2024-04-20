@@ -1,13 +1,12 @@
 package me.ailama.autoevents.commandhandler;
 
-import me.ailama.commands.AiCommand;
 import me.ailama.config.Config;
+import me.ailama.handler.commandhandler.CommandRegister;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class HandleCommand extends ListenerAdapter {
     @Override
@@ -25,8 +24,8 @@ public class HandleCommand extends ListenerAdapter {
             return;
         }
 
-        if(event.getInteraction().getName().equals("ai")) {
-            new AiCommand().handleCommand(event);
+        if(CommandRegister.getInstance().getCommandMap().containsKey(event.getInteraction().getName())) {
+            CommandRegister.getInstance().getCommand(event.getInteraction().getName()).handleCommand(event);
         }
     }
 }
