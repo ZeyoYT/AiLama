@@ -46,7 +46,7 @@ public class WebCommand implements AiLamaSlashCommand {
         }
 
         // Set Configurations
-        String queryOption = event.getOption("query").getAsString();
+        String queryOption = event.getOption("search").getAsString();
         String instructionOption = event.getOption("instructions") != null ? event.getOption("instructions").getAsString() : "";
         String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
 
