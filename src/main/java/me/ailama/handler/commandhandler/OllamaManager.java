@@ -24,13 +24,13 @@ public class OllamaManager {
 
     private final String url;
     private final String model;
-    private final String embbedingModel;
+    private final String embeddingModel;
 
     public OllamaManager() {
 
         url = AiLama.getInstance().fixUrl(Config.get("OLLAMA_URL") + ":" + Config.get("OLLAMA_PORT"));
         model = Config.get("OLLAMA_MODEL");
-        embbedingModel = Config.get("OLLAMA_EMBEDDING_MODEL");
+        embeddingModel = Config.get("OLLAMA_EMBEDDING_MODEL");
 
     }
 
@@ -54,7 +54,7 @@ public class OllamaManager {
         DocumentSplitter splitter = DocumentSplitters.recursive(500, 0);
         List<TextSegment> segments = splitter.split(document);
 
-        OllamaEmbeddingModel embeddingModel = OllamaEmbeddingModel.builder().baseUrl(url).modelName(embbedingModel).build();
+        OllamaEmbeddingModel embeddingModel = OllamaEmbeddingModel.builder().baseUrl(url).modelName(this.embeddingModel).build();
         List<Embedding> embeddings = embeddingModel.embedAll(segments).content();
 
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();

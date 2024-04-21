@@ -121,6 +121,7 @@ public class SearXNGManager {
                 if(!searXNG.results.get(0).toString().isEmpty()) {
 
                     SearXNGResult bestResult = bestMatch(searXNG);
+
                     return bestResult.url;
 
                 }

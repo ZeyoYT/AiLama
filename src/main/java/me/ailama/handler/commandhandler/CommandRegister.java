@@ -1,6 +1,7 @@
 package me.ailama.handler.commandhandler;
 
 import me.ailama.commands.AiCommand;
+import me.ailama.commands.WebCommand;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
@@ -16,6 +17,7 @@ public class CommandRegister {
         this.slashCommands = new HashMap<>();
 
         addCommand(new AiCommand());
+        addCommand(new WebCommand());
     }
 
     public AiLamaSlashCommand getCommand(String name) {

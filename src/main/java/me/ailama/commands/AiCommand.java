@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.IntegrationType;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -119,14 +118,8 @@ public class AiCommand implements AiLamaSlashCommand {
 
     public Assistant urlAssistant(String urlForContent, String url, String model) {
         try {
-            URL webUrl = null;
 
-            if(urlForContent != null) {
-                webUrl = new URL(urlForContent);
-            }
-            else {
-                webUrl = new URL(AiLama.getInstance().fixUrl(url));
-            }
+            URL webUrl = urlForContent != null ? new URL(urlForContent) : new URL(AiLama.getInstance().fixUrl(url));
 
             Document htmlDoc = UrlDocumentLoader.load(webUrl, new TextDocumentParser());
             HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
@@ -136,7 +129,8 @@ public class AiCommand implements AiLamaSlashCommand {
         }
         catch (Exception e) {
 
-            SearXNGManager.getInstance().addForbiddenUrl(urlForContent, e.getMessage());
+            String errorUrl = urlForContent != null ? urlForContent : url;
+            SearXNGManager.getInstance().addForbiddenUrl(errorUrl, e.getMessage());
 
             return null;
         }
