@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import org.jsoup.Jsoup;
 
 import java.net.URL;
 
@@ -76,18 +77,10 @@ public class WebCommand implements AiLamaSlashCommand {
     // Response Based on Provided URL
     public Assistant urlAssistant(String urlForContent, String url, String model) {
         try {
-            URL webUrl = null;
 
-            if(urlForContent != null) {
-                webUrl = new URL(urlForContent);
-            }
-            else {
-                webUrl = new URL(AiLama.getInstance().fixUrl(url));
-            }
-
-            Document htmlDoc = UrlDocumentLoader.load(webUrl, new TextDocumentParser());
-            HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
-            Document document = transformer.transform(htmlDoc);
+            String webUrl = urlForContent != null ? urlForContent : AiLama.getInstance().fixUrl(url);
+            String textOnly = Jsoup.connect(webUrl).get().body().text();
+            Document document = Document.from(textOnly);
 
             return OllamaManager.getInstance().createAssistant(document, model);
         }
