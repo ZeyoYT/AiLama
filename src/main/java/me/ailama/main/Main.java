@@ -36,7 +36,8 @@ public class Main {
                         GatewayIntent.GUILD_VOICE_STATES,
                         GatewayIntent.GUILD_MESSAGE_REACTIONS,
                         GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
-                        GatewayIntent.SCHEDULED_EVENTS
+                        GatewayIntent.SCHEDULED_EVENTS,
+                        GatewayIntent.MESSAGE_CONTENT
                 )
 
                 .enableCache(

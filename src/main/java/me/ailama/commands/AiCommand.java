@@ -1,9 +1,5 @@
 package me.ailama.commands;
 
-import dev.langchain4j.data.document.Document;
-import dev.langchain4j.data.document.loader.UrlDocumentLoader;
-import dev.langchain4j.data.document.parser.TextDocumentParser;
-import dev.langchain4j.data.document.transformer.HtmlTextExtractor;
 import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.commandhandler.SearXNGManager;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
@@ -16,9 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import org.jsoup.Jsoup;
 
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,7 +71,7 @@ public class AiCommand implements AiLamaSlashCommand {
 
         if(urlOption != null || urlForContent != null) {
             // if the url option is provided or the web option is provided, ask the assistant to answer the query based on the url
-            Assistant assistant = urlAssistant(urlForContent, urlOption, modelOption);
+            Assistant assistant = OllamaManager.getInstance().urlAssistant( urlForContent != null ? urlForContent : urlOption , modelOption);
 
             if(assistant != null) {
                 response = Optional.ofNullable(assistant.answer(queryOption)).orElse("Web search failed");
@@ -114,24 +108,6 @@ public class AiCommand implements AiLamaSlashCommand {
         else
         {
             event.getHook().sendMessage(response).queue();
-        }
-    }
-
-    public Assistant urlAssistant(String urlForContent, String url, String model) {
-        try {
-
-            String webUrl = urlForContent != null ? urlForContent : AiLama.getInstance().fixUrl(url);
-            String textOnly = Jsoup.connect(webUrl).get().body().text();
-            Document document = Document.from(textOnly);
-
-            return OllamaManager.getInstance().createAssistant(document, model);
-        }
-        catch (Exception e) {
-
-            String errorUrl = urlForContent != null ? urlForContent : url;
-            SearXNGManager.getInstance().addForbiddenUrl(errorUrl, e.getMessage());
-
-            return null;
         }
     }
 

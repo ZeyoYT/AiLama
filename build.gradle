@@ -9,8 +9,8 @@ group = 'me.ailama'
 version = '1.0'
 assemble.dependsOn(shadowJar)
 
-targetCompatibility = 19
-sourceCompatibility = 19
+targetCompatibility = 21
+sourceCompatibility = 21
 
 shadowJar{
     destinationDirectory.set(new File(projectDir,"./build/shadow"))
@@ -53,5 +53,5 @@ dependencies {
 
     implementation 'dev.langchain4j:langchain4j-easy-rag:0.30.0'
 
-
 }
+

@@ -1,14 +1,9 @@
 package me.ailama.commands;
 
-import dev.langchain4j.data.document.Document;
-import dev.langchain4j.data.document.loader.UrlDocumentLoader;
-import dev.langchain4j.data.document.parser.TextDocumentParser;
-import dev.langchain4j.data.document.transformer.HtmlTextExtractor;
 import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.commandhandler.SearXNGManager;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import me.ailama.handler.interfaces.Assistant;
-import me.ailama.main.AiLama;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.IntegrationType;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
@@ -16,9 +11,6 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import org.jsoup.Jsoup;
-
-import java.net.URL;
 
 public class WebCommand implements AiLamaSlashCommand {
     @Override
@@ -60,8 +52,8 @@ public class WebCommand implements AiLamaSlashCommand {
             return;
         }
 
-        // Create an Assistant
-        Assistant assistant = urlAssistant(urlForContent, null, modelOption);
+        // Create an URL Assistant
+        Assistant assistant = OllamaManager.getInstance().urlAssistant(urlForContent, modelOption);
 
         // if there was an error while creating the assistant
         if(assistant == null) {
@@ -72,23 +64,5 @@ public class WebCommand implements AiLamaSlashCommand {
         // Get the response
         String response = assistant.answer(instructionOption != null ? instructionOption : "give details on the content");
         event.getHook().sendMessage(response).setEphemeral(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()).queue();
-    }
-
-    // Response Based on Provided URL
-    public Assistant urlAssistant(String urlForContent, String url, String model) {
-        try {
-
-            String webUrl = urlForContent != null ? urlForContent : AiLama.getInstance().fixUrl(url);
-            String textOnly = Jsoup.connect(webUrl).get().body().text();
-            Document document = Document.from(textOnly);
-
-            return OllamaManager.getInstance().createAssistant(document, model);
-        }
-        catch (Exception e) {
-
-            SearXNGManager.getInstance().addForbiddenUrl(urlForContent, e.getMessage());
-
-            return null;
-        }
     }
 }

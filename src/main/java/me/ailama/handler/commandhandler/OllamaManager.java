@@ -15,6 +15,7 @@ import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import me.ailama.config.Config;
 import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
+import org.jsoup.Jsoup;
 
 import java.util.List;
 
@@ -73,6 +74,23 @@ public class OllamaManager {
                 .chatLanguageModel(ollama)
                 .contentRetriever(contentRetriever)
                 .build();
+    }
+
+    public Assistant urlAssistant(String url, String model) {
+        try {
+
+            String webUrl = AiLama.getInstance().fixUrl(url);
+            String textOnly = Jsoup.connect(webUrl).get().body().text();
+            Document document = Document.from(textOnly);
+
+            return OllamaManager.getInstance().createAssistant(document, model);
+        }
+        catch (Exception e) {
+
+            SearXNGManager.getInstance().addForbiddenUrl(url, e.getMessage());
+
+            return null;
+        }
     }
 
     public static OllamaManager getInstance() {

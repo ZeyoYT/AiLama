@@ -25,7 +25,7 @@ public class HandleCommand extends ListenerAdapter {
         }
 
         if(CommandRegister.getInstance().getCommandMap().containsKey(event.getInteraction().getName())) {
-            CommandRegister.getInstance().getCommand(event.getInteraction().getName()).handleCommand(event);
+            Thread.ofVirtual().start(() -> CommandRegister.getInstance().getCommand(event.getInteraction().getName()).handleCommand(event));
         }
     }
 }
