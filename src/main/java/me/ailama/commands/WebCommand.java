@@ -10,6 +10,9 @@ import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.IntegrationType;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -20,6 +23,9 @@ public class WebCommand implements AiLamaSlashCommand {
     @Override
     public SlashCommandData getCommandData() {
         return Commands.slash("web", "command that searches the web and generates a response based on the content")
+                .setIntegrationTypes(IntegrationType.USER_INSTALL)
+                .setContexts(InteractionContextType.ALL)
+                .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
 
                 .addOption(OptionType.STRING, "search", "The query you want to search for", true)
                 .addOption(OptionType.STRING, "instructions", "additional instructions after getting search result", false)
