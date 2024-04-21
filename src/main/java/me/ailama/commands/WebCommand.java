@@ -47,7 +47,7 @@ public class WebCommand implements AiLamaSlashCommand {
 
         // Set Configurations
         String queryOption = event.getOption("search").getAsString();
-        String instructionOption = event.getOption("instructions") != null ? event.getOption("instructions").getAsString() : "";
+        String instructionOption = event.getOption("instructions") != null ? event.getOption("instructions").getAsString() : null;
         String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
 
         // Get the URL for the content
@@ -69,8 +69,8 @@ public class WebCommand implements AiLamaSlashCommand {
         }
 
         // Get the response
-        String response = assistant.answer(instructionOption);
-        event.getHook().sendMessage(response).setEphemeral(true).queue();
+        String response = assistant.answer(instructionOption != null ? instructionOption : "give details on the content");
+        event.getHook().sendMessage(response).setEphemeral(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()).queue();
     }
 
     // Response Based on Provided URL
