@@ -19,7 +19,9 @@ jobs:
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
       - name: Build the Docker image
-        run: docker build . -t ${{ secrets.DOCKERHUB_USERNAME }}/ailama:$(date +%s)
+        run: docker build . -t ${{ secrets.DOCKERHUB_USERNAME }}/ailama:latest -t ${{ secrets.DOCKERHUB_USERNAME }}/ailama:${{ github.sha }}
 
-      - name: Push the Docker image (with tag)
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/ailama:$(date +%s)
+      - name: Push the Docker image (latest and sha tags)
+        run: |
+             docker push ${{ secrets.DOCKERHUB_USERNAME }}/ailama:latest
+             docker push ${{ secrets.DOCKERHUB_USERNAME }}/ailama:${{ github.sha }}
