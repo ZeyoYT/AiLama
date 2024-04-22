@@ -71,7 +71,7 @@ public class AiCommand implements AiLamaSlashCommand {
 
         if(urlOption != null || urlForContent != null) {
             // if the url option is provided or the web option is provided, ask the assistant to answer the query based on the url
-            Assistant assistant = OllamaManager.getInstance().urlAssistant( urlForContent != null ? urlForContent : urlOption , modelOption);
+            Assistant assistant = OllamaManager.getInstance().urlAssistant( List.of(urlForContent != null ? urlForContent : urlOption) , modelOption);
 
             if(assistant != null) {
                 response = Optional.ofNullable(assistant.answer(queryOption)).orElse("Web search failed");

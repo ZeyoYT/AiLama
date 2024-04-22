@@ -20,8 +20,12 @@ public class HandleCommand extends ListenerAdapter {
         whitelistedUsers.add(Config.get("DEV_ID"));
 
         if(!whitelistedUsers.contains(event.getUser().getId())) {
-            event.reply("You are not allowed to use this command. its only made for " + event.getJDA().getUserById(Config.get("DEV_ID")).getAsMention() + "or a select few whitelisted people").setEphemeral(true).queue();
-            return;
+
+            event.getJDA().retrieveUserById(Config.get("DEV_ID")).queue(user -> {
+                event.reply("You are not allowed to use this command. its only made for " + user.getAsMention() + "or a select few whitelisted people").setEphemeral(true).queue();
+            }, err -> {
+                event.reply("You are not allowed to use this command. its only made for the developer or a select few whitelisted people").setEphemeral(true).queue();
+            });
         }
 
         if(CommandRegister.getInstance().getCommandMap().containsKey(event.getInteraction().getName())) {

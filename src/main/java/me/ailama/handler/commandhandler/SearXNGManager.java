@@ -13,6 +13,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class SearXNGManager {
 
@@ -23,7 +24,7 @@ public class SearXNGManager {
     private final String finalUrl;
 
     // urls that either are blocked or fails to load as documents
-    private final List<String> forbiddenUrls;
+    private final ArrayList<String> forbiddenUrls;
 
     public SearXNGManager() {
 
@@ -102,11 +103,11 @@ public class SearXNGManager {
 
             try {
 
-                String searxUrl = String.format(finalUrl, URLEncoder.encode(query, StandardCharsets.UTF_8));
+                String searXUrl = String.format(finalUrl, URLEncoder.encode(query, StandardCharsets.UTF_8));
 
                 OkHttpClient client = new OkHttpClient();
                 okhttp3.Request request = new okhttp3.Request.Builder()
-                        .url(searxUrl)
+                        .url(searXUrl)
                         .build();
 
                 String json = client.newCall(request).execute().body().string();
@@ -125,6 +126,60 @@ public class SearXNGManager {
                     return bestResult.url;
 
                 }
+            }
+            catch (Exception e) {
+                Main.LOGGER.error("Error while getting the URL from the search: " + e.getMessage());
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    /*
+        - Returns X amount URLs with the best result from the search
+        - If no results are found, it will return null
+
+        - max amount is 10
+        - min amount is 1
+    */
+    public List<String> getTopSearchResults(String query, int amount) {
+        if(url != null) {
+
+            try {
+
+                int amountToGet = Math.min(amount, 10);
+                String searXUrl = String.format(finalUrl, URLEncoder.encode(query, StandardCharsets.UTF_8));
+
+                OkHttpClient client = new OkHttpClient();
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url(searXUrl)
+                        .build();
+
+                String json = client.newCall(request).execute().body().string();
+
+                ObjectMapper mapper = new ObjectMapper();
+                SearXNG searXNG = mapper.readValue(json, SearXNG.class);
+
+                if(searXNG.results.isEmpty()) {
+                    return null;
+                }
+
+                ArrayList<SearXNGResult> bestResults = searXNG.results;
+
+                List<SearXNGResult> filteredList = new ArrayList<>(searXNG.results.stream()
+                        .filter(result -> !forbiddenUrls.contains(result.url))
+                        .toList());
+
+                // make it so that filteredList is sorted by score
+                filteredList.sort((result1, result2) -> Double.compare(result2.score, result1.score));
+
+                amountToGet = Math.min(amountToGet, filteredList.size());
+
+                return filteredList.subList(0, amountToGet).stream()
+                        .map(result -> result.url)
+                        .toList();
+
             }
             catch (Exception e) {
                 Main.LOGGER.error("Error while getting the URL from the search: " + e.getMessage());

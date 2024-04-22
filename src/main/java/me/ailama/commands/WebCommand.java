@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
+import java.util.List;
+
 public class WebCommand implements AiLamaSlashCommand {
     @Override
     public SlashCommandData getCommandData() {
@@ -22,6 +24,7 @@ public class WebCommand implements AiLamaSlashCommand {
 
                 .addOption(OptionType.STRING, "search", "The query you want to search for", true)
                 .addOption(OptionType.STRING, "instructions", "additional instructions after getting search result", false)
+                .addOption(OptionType.INTEGER, "limit", "The limit of search results", false)
                 .addOption(OptionType.BOOLEAN, "ephemeral", "If you want the response to be ephemeral", false)
                 .addOption(OptionType.STRING, "model", "Example (gemma:2b)", false)
 
@@ -42,9 +45,20 @@ public class WebCommand implements AiLamaSlashCommand {
         String queryOption = event.getOption("search").getAsString();
         String instructionOption = event.getOption("instructions") != null ? event.getOption("instructions").getAsString() : null;
         String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
+        int limitOption = event.getOption("limit") != null ? event.getOption("limit").getAsInt() : 1;
+
+        if(limitOption < 1) {
+            event.getHook().sendMessage("Limit should be greater than 0").setEphemeral(true).queue();
+            return;
+        }
+
+        if(limitOption > 10) {
+            event.getHook().sendMessage("Limit should be less than equal to 10").setEphemeral(true).queue();
+            return;
+        }
 
         // Get the URL for the content
-        String urlForContent = SearXNGManager.getInstance().getUrlFromSearch(queryOption);
+        List<String> urlForContent = SearXNGManager.getInstance().getTopSearchResults(queryOption, limitOption);
 
         // If no proper results were found from the search
         if(urlForContent == null) {
@@ -52,7 +66,7 @@ public class WebCommand implements AiLamaSlashCommand {
             return;
         }
 
-        // Create an URL Assistant
+        // Create a URL Assistant
         Assistant assistant = OllamaManager.getInstance().urlAssistant(urlForContent, modelOption);
 
         // if there was an error while creating the assistant
@@ -62,7 +76,7 @@ public class WebCommand implements AiLamaSlashCommand {
         }
 
         // Get the response
-        String response = assistant.answer(instructionOption != null ? instructionOption : "give details on the content");
+        String response = assistant.answer(instructionOption != null ? instructionOption : queryOption);
         event.getHook().sendMessage(response).setEphemeral(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()).queue();
     }
 }

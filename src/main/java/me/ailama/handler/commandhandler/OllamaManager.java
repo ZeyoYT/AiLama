@@ -17,6 +17,7 @@ import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
 import org.jsoup.Jsoup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OllamaManager {
@@ -48,18 +49,21 @@ public class OllamaManager {
     }
 
     // Response Based on Provided Document
-    public Assistant createAssistant(Document document, String modelName) {
+    public Assistant createAssistant(List<Document> documents, String modelName) {
 
         String aiModel = modelName != null ? modelName : model;
 
-        DocumentSplitter splitter = DocumentSplitters.recursive(500, 0);
-        List<TextSegment> segments = splitter.split(document);
-
-        OllamaEmbeddingModel embeddingModel = OllamaEmbeddingModel.builder().baseUrl(url).modelName(this.embeddingModel).build();
-        List<Embedding> embeddings = embeddingModel.embedAll(segments).content();
-
+        DocumentSplitter splitter = DocumentSplitters.recursive(300, 0);
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-        embeddingStore.addAll(embeddings, segments);
+        OllamaEmbeddingModel embeddingModel = OllamaEmbeddingModel.builder().baseUrl(url).modelName(this.embeddingModel).build();
+
+
+        for (Document doc : documents) {
+            List<TextSegment> segments = splitter.split(doc);
+            List<Embedding> embeddings = embeddingModel.embedAll(segments).content();
+
+            embeddingStore.addAll(embeddings, segments);
+        }
 
         ContentRetriever contentRetriever = EmbeddingStoreContentRetriever.builder()
                 .embeddingStore(embeddingStore)
@@ -76,21 +80,34 @@ public class OllamaManager {
                 .build();
     }
 
-    public Assistant urlAssistant(String url, String model) {
-        try {
+    public Assistant urlAssistant(List<String> url, String model) {
 
-            String webUrl = AiLama.getInstance().fixUrl(url);
-            String textOnly = Jsoup.connect(webUrl).get().body().text();
-            Document document = Document.from(textOnly);
+        List<Document> documents = new ArrayList<>();
 
-            return OllamaManager.getInstance().createAssistant(document, model);
+        for (String u : url) {
+
+            try {
+
+                String webUrl = AiLama.getInstance().fixUrl(u);
+                String textOnly = Jsoup.connect(webUrl).get().body().text();
+                Document document = Document.from(textOnly);
+
+                documents.add(document);
+
+            }
+            catch (Exception e) {
+
+                SearXNGManager.getInstance().addForbiddenUrl(u, e.getMessage());
+
+            }
         }
-        catch (Exception e) {
 
-            SearXNGManager.getInstance().addForbiddenUrl(url, e.getMessage());
-
+        if(documents.isEmpty()) {
             return null;
         }
+
+        return OllamaManager.getInstance().createAssistant(documents, model);
+
     }
 
     public static OllamaManager getInstance() {
