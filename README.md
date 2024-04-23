@@ -147,7 +147,6 @@ WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 2. URL RAG might not work with smaller models that support less context window
 3. Only supports Ollama right now
 4. No Memory for previous conversations
-5. Multiple Response Requests are not supported
 
 <br>
 
@@ -322,3 +321,16 @@ Example :-
 ```
 /ai ask:What is the Time web:True
 ```
+
+<br>
+
+### Asking Query using Web Search and Providing a Website URL For Context :-
+```
+/web search: <search query>
+```
+
+Example :-
+```
+/ai ask:What is the Time
+```
+

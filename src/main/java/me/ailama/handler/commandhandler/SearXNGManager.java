@@ -165,8 +165,6 @@ public class SearXNGManager {
                     return null;
                 }
 
-                ArrayList<SearXNGResult> bestResults = searXNG.results;
-
                 List<SearXNGResult> filteredList = new ArrayList<>(searXNG.results.stream()
                         .filter(result -> !forbiddenUrls.contains(result.url))
                         .toList());
@@ -202,4 +200,7 @@ public class SearXNGManager {
         return SearXNGManager.searXNGManager;
     }
 
+    public boolean isForbiddenUrl(String url) {
+        return forbiddenUrls.contains(url);
+    }
 }

@@ -41,7 +41,7 @@ repositories {
 
 dependencies {
 
-    implementation group: 'io.github.freya022', name: 'JDA', version: 'f2d4e9d545'
+    implementation group: 'io.github.freya022', name: 'JDA', version: '5905e6316b'
     implementation group: 'io.github.cdimascio', name: 'java-dotenv', version: '5.2.2'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.2'
     implementation group: 'dev.langchain4j', name: 'langchain4j-ollama', version: '0.30.0'

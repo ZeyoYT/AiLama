@@ -74,7 +74,12 @@ public class AiCommand implements AiLamaSlashCommand {
             Assistant assistant = OllamaManager.getInstance().urlAssistant( List.of(urlForContent != null ? urlForContent : urlOption) , modelOption);
 
             if(assistant != null) {
-                response = Optional.ofNullable(assistant.answer(queryOption)).orElse("Web search failed");
+                response = assistant.answer(queryOption);
+
+                // add the source of the content to the response
+                if(response != null) {
+                    response += "\n\nSource: <" + (urlForContent != null ? urlForContent : urlOption) + ">";
+                }
             }
         }
         else

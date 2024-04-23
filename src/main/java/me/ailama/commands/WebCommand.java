@@ -4,6 +4,7 @@ import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.commandhandler.SearXNGManager;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import me.ailama.handler.interfaces.Assistant;
+import me.ailama.main.AiLama;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.IntegrationType;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
@@ -77,6 +78,47 @@ public class WebCommand implements AiLamaSlashCommand {
 
         // Get the response
         String response = assistant.answer(instructionOption != null ? instructionOption : queryOption);
-        event.getHook().sendMessage(response).setEphemeral(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()).queue();
+        response += "\n";
+
+        // Add the source of the content
+        StringBuilder source = new StringBuilder();
+        boolean hadForbiddenUrl = false;
+
+        for (String url : urlForContent) {
+            if(SearXNGManager.getInstance().isForbiddenUrl(url)) {
+                hadForbiddenUrl = true;
+                continue;
+            }
+
+            source.append("\nSource: <").append(url).append(">");
+        }
+
+        if(hadForbiddenUrl) {
+            source.append("\n\nSome URLs were forbidden and were not included in the source");
+        }
+
+        response += source.toString();
+
+        if(response.length() > 2000) {
+            List<String> responses = AiLama.getInstance().getParts(response, 2000);
+
+            for(String res : responses) {
+                sendMessage(event, res);
+            }
+
+            return;
+        }
+
+        sendMessage(event, response);
+    }
+
+    public void sendMessage(SlashCommandInteractionEvent event, String response) {
+        if(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()) {
+            event.getHook().sendMessage(response).setEphemeral(true).queue();
+        }
+        else
+        {
+            event.getHook().sendMessage(response).queue();
+        }
     }
 }
