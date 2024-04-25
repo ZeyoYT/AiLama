@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 import java.util.List;
-import java.util.Optional;
 
 public class AiCommand implements AiLamaSlashCommand {
 

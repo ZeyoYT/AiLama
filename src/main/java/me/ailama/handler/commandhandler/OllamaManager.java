@@ -49,11 +49,11 @@ public class OllamaManager {
     }
 
     // Response Based on Provided Document
-    public Assistant createAssistant(List<Document> documents, String modelName) {
+    public Assistant createAssistant(List<Document> documents, String modelName, String systemMessage) {
 
         String aiModel = modelName != null ? modelName : model;
 
-        DocumentSplitter splitter = DocumentSplitters.recursive(300, 0);
+        DocumentSplitter splitter = DocumentSplitters.recursive(500, 0);
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
         OllamaEmbeddingModel embeddingModel = OllamaEmbeddingModel.builder().baseUrl(url).modelName(this.embeddingModel).build();
 
@@ -74,9 +74,15 @@ public class OllamaManager {
 
         OllamaChatModel ollama = OllamaChatModel.builder().baseUrl(url).modelName(aiModel).temperature(0.4).build();
 
-        return AiServices.builder(Assistant.class)
+        AiServices<Assistant> assistantAiServices = AiServices.builder(Assistant.class)
                 .chatLanguageModel(ollama)
-                .contentRetriever(contentRetriever)
+                .contentRetriever(contentRetriever);
+
+        if(systemMessage != null) {
+            assistantAiServices.systemMessageProvider(o -> systemMessage);
+        }
+
+        return assistantAiServices
                 .build();
     }
 
@@ -106,7 +112,7 @@ public class OllamaManager {
             return null;
         }
 
-        return OllamaManager.getInstance().createAssistant(documents, model);
+        return OllamaManager.getInstance().createAssistant(documents, model, null);
 
     }
 
