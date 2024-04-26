@@ -35,6 +35,8 @@ Please Read : [Important Things to Consider](#important-things-to-consider-befor
 - Simple To Use
 - Web Search Capabilities using SearXNG
 - Web Document for RAG Support using URL
+- Function Calling
+- Normal Document Support
 - can be used anywhere in discord where user installable apps are supported
 - you can run you query by a different model on the fly using the model's field ( example below )
 - URL RAG supported, where you can provide a url in the URL Option and the bot will take the Website as a context
@@ -44,6 +46,7 @@ Please Read : [Important Things to Consider](#important-things-to-consider-befor
 ## Prerequisite
 
 - Ollama 0.28 or Greater ( [Download Here](https://ollama.com/download) )
+- Ai Model for Ollama ( [Download Here](https://ollama.com/models) ) [ [llama3](https://ollama.com/library/llama3) Preferred ]
 - Java 19 or Greater
 - Gradle 7.6 or Greater ( [Download Here](https://gradle.org/) )
 - A Discord App ( make __[New](https://discord.com/developers/applications)__ app from discord developer portal )

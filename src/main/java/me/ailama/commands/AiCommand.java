@@ -159,7 +159,6 @@ public class AiCommand implements AiLamaSlashCommand {
                 }
             }
             catch (Exception ignore) {
-                System.out.println(ignore.getMessage());
                 response = temp;
             }
 

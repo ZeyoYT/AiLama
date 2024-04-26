@@ -80,8 +80,7 @@ public class OllamaManager {
                 for (int i = 0; i < toolAnnotation.arguments().length; i++) {
 
                     arguments.add("name",toolAnnotation.arguments()[i].name())
-                            .add("type",toolAnnotation.arguments()[i].Type())
-                            .add("value", "change_me");
+                            .add("type",toolAnnotation.arguments()[i].Type());
 
                 }
                 object.add("arguments",arguments);
