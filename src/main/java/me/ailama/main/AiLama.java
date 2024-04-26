@@ -21,16 +21,99 @@ public class AiLama
     }
 
     @Tool(name = "add", description = "Addition ('+') of two numbers like N1+N2", arguments = {
-            @Args(name = "a", Type = "int"),
-            @Args(name = "b", Type = "int")
+            @Args(name = "a", Type = "number"),
+            @Args(name = "b", Type = "number")
     })
-    public String add(int a, int b) {
-        return String.valueOf(a + b);
+    public String add(Number a, Number b) {
+        return String.valueOf(a.doubleValue() + b.doubleValue());
     }
 
-    public String formatTime(final long timeInMillis) {
+    @Tool(name = "subtract", description = "Subtraction ('-') of two numbers like N1-N2", arguments = {
+            @Args(name = "a", Type = "number"),
+            @Args(name = "b", Type = "number")
+    })
+    public String subtract(Number a, Number b) {
+        return String.valueOf(a.doubleValue() - b.doubleValue());
+    }
 
-        Main.LOGGER.info("Formatting time from milliseconds to a readable format");
+    @Tool(name = "multiply", description = "Multiplication ('*') of two numbers like N1*N2", arguments = {
+            @Args(name = "a", Type = "number"),
+            @Args(name = "b", Type = "number")
+    })
+    public String multiply(Number a, Number b) {
+        return String.valueOf(a.doubleValue() * b.doubleValue());
+    }
+
+    @Tool(name = "divide", description = "Division ('/') of two numbers like N1/N2", arguments = {
+            @Args(name = "a", Type = "number"),
+            @Args(name = "b", Type = "number")
+    })
+    public String divide(Number a, Number b) {
+        return String.valueOf(a.doubleValue() / b.doubleValue());
+    }
+
+    @Tool(name = "modulus", description = "Modulus ('%') of two numbers like N1%N2", arguments = {
+            @Args(name = "a", Type = "number"),
+            @Args(name = "b", Type = "number")
+    })
+    public String modulus(Number a, Number b) {
+        return String.valueOf(a.doubleValue() % b.doubleValue());
+    }
+
+    @Tool(name = "power", description = "Power ('^') of two numbers like N1^N2", arguments = {
+            @Args(name = "a", Type = "number"),
+            @Args(name = "b", Type = "number")
+    })
+    public String power(Number a, Number b) {
+        return String.valueOf(Math.pow(a.doubleValue(), b.doubleValue()));
+    }
+
+    @Tool(name = "sqrt", description = "Square root of a number like sqrt(N1)", arguments = {
+            @Args(name = "a", Type = "number")
+    })
+    public String sqrt(Number a) {
+        return String.valueOf(Math.sqrt(a.doubleValue()));
+    }
+
+    @Tool(name = "cbrt", description = "Cube root of a number like cbrt(N1)", arguments = {
+            @Args(name = "a", Type = "number")
+    })
+    public String cbrt(Number a) {
+        return String.valueOf(Math.cbrt(a.doubleValue()));
+    }
+
+    @Tool(name = "abs", description = "Absolute value of a number like abs(N1)", arguments = {
+            @Args(name = "a", Type = "number")
+    })
+    public String abs(Number a) {
+        return String.valueOf(Math.abs(a.doubleValue()));
+    }
+
+    @Tool(name = "round", description = "Round a number like round(N1)", arguments = {
+            @Args(name = "a", Type = "number")
+    })
+    public String round(Number a) {
+        return String.valueOf(Math.round(a.doubleValue()));
+    }
+
+    @Tool(name = "ceil", description = "Ceil a number like ceil(N1)", arguments = {
+            @Args(name = "a", Type = "number")
+    })
+    public String ceil(Number a) {
+        return String.valueOf(Math.ceil(a.doubleValue()));
+    }
+
+    @Tool(name = "floor", description = "Floor a number like floor(N1)", arguments = {
+            @Args(name = "a", Type = "number")
+    })
+    public String floor(Number a) {
+        return String.valueOf(Math.floor(a.doubleValue()));
+    }
+
+    @Tool(name = "formatTime", description = "Format time from milliseconds to a readable format like formatTime(N1)", arguments = {
+            @Args(name = "timeInMillis", Type = "number")
+    })
+    public String formatTime(final long timeInMillis) {
 
         int seconds = (int) (timeInMillis / 1000) % 60;
         int minutes = (int) ((timeInMillis / (1000*60)) % 60);
@@ -43,11 +126,12 @@ public class AiLama
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
-    public static AiLama getInstance() {
-        if (AiLama.INSTANCE == null) {
-            AiLama.INSTANCE = new AiLama();
+
+    public String fixUrl(String url) {
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            return "https://" + url;
         }
-        return AiLama.INSTANCE;
+        return url;
     }
 
     public List<String> getParts(final String string, final int partitionSize) {
@@ -58,6 +142,9 @@ public class AiLama
         return parts;
     }
 
+    @Tool(name = "isValidURL", description = "Check if a URL is valid like isValidURL(url)", arguments = {
+            @Args(name = "url", Type = "string")
+    })
     public boolean isValidURL(String url) {
         try {
             new URL(url).toURI();
@@ -67,10 +154,11 @@ public class AiLama
         }
     }
 
-    public String fixUrl(String url) {
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            return "https://" + url;
+    public static AiLama getInstance() {
+        if (AiLama.INSTANCE == null) {
+            AiLama.INSTANCE = new AiLama();
         }
-        return url;
+        return AiLama.INSTANCE;
     }
+
 }

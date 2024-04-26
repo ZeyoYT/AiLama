@@ -133,6 +133,8 @@ public class AiCommand implements AiLamaSlashCommand {
 
             ObjectMapper mapper = new ObjectMapper();
 
+            String temp = response;
+
             try {
                 Tool tooled = mapper.readValue(response, Tool.class);
 
@@ -145,7 +147,7 @@ public class AiCommand implements AiLamaSlashCommand {
                 }
             }
             catch (Exception ignore) {
-
+                response = temp;
             }
 
         }

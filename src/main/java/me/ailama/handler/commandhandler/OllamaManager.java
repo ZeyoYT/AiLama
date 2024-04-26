@@ -18,6 +18,7 @@ import me.ailama.handler.JsonBuilder.JsonObject;
 import me.ailama.handler.annotations.Tool;
 import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
+import me.ailama.main.Main;
 import org.jsoup.Jsoup;
 
 import java.lang.reflect.Method;
@@ -34,7 +35,7 @@ public class OllamaManager {
     private final String model;
     private final String embeddingModel;
 
-    private final HashMap<String,Object> tools;
+    private final HashMap<String,Method> tools;
 
     public OllamaManager() {
 
@@ -55,7 +56,7 @@ public class OllamaManager {
 
         getMethodsAnnotated(tool.getClass()).forEach(method -> {
             try {
-                tools.put(method.getName(),tool);
+                tools.put(method.getName(),method);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -66,52 +67,55 @@ public class OllamaManager {
         JsonArray toolJsonArray = new JsonArray();
 
         List<JsonObject> toolJsonObjects = new ArrayList<>();
-        for (Object tool : tools.values()) {
-            for (Method method : getMethodsAnnotated(tool.getClass())) {
-                Tool toolAnnotation = method.getAnnotation(Tool.class);
 
-                JsonObject object = new JsonObject()
-                        .add("name",toolAnnotation.name())
-                        .add("description",toolAnnotation.description());
+        tools.forEach((name, tool) -> {
+            Tool toolAnnotation = tool.getAnnotation(Tool.class);
 
-                if(toolAnnotation.arguments().length > 0) {
-                    JsonObject arguments = new JsonObject();
-                    for (int i = 0; i < toolAnnotation.arguments().length; i++) {
+            JsonObject object = new JsonObject()
+                    .add("name",toolAnnotation.name())
+                    .add("description",toolAnnotation.description());
 
-                        arguments.add("name",toolAnnotation.arguments()[i].name())
-                                .add("type",toolAnnotation.arguments()[i].Type())
-                                .add("value", "change_me");
+            if(toolAnnotation.arguments().length > 0) {
+                JsonObject arguments = new JsonObject();
+                for (int i = 0; i < toolAnnotation.arguments().length; i++) {
 
-                    }
-                    object.add("arguments",arguments);
+                    arguments.add("name",toolAnnotation.arguments()[i].name())
+                            .add("type",toolAnnotation.arguments()[i].Type())
+                            .add("value", "change_me");
+
                 }
-
-                toolJsonObjects.add(object);
+                object.add("arguments",arguments);
             }
-        }
+
+            toolJsonObjects.add(object);
+        });
+
 
         return toolJsonArray.objects(toolJsonObjects);
     }
 
+    public Method getTool(String toolName) {
+        return tools.get(toolName);
+    }
+
     public Object executeTool(String toolName, Object... args) {
 
-        Object tool = tools.get(toolName);
+        try {
 
-        if(tool == null) {
-            return null;
-        }
+            Method tool = getTool(toolName);
 
-        for (Method method : getMethodsAnnotated(tool.getClass())) {
-            if(method.getName().equals(toolName)) {
-                try {
-                    return method.invoke(tool,args);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            if(tool == null) {
+                return null;
             }
-        }
 
-        return null;
+            return tool.invoke(AiLama.getInstance(),args);
+
+        } catch (Exception ignore) {
+
+            System.out.println("Error while executing tool: " + ignore.getMessage());
+            return null;
+
+        }
     }
 
     public static List<Method> getMethodsAnnotated(final Class<?> type) {
