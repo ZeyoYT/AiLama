@@ -118,6 +118,7 @@ public class OllamaManager {
         }
     }
 
+    // Get all methods annotated with Tool
     public static List<Method> getMethodsAnnotated(final Class<?> type) {
         final List<Method> methods = new ArrayList<>();
         Class<?> klass = type;
@@ -134,7 +135,7 @@ public class OllamaManager {
         return methods;
     }
 
-    // Just a Simple Response
+    // Returns a custom Assistant that uses the provided model, allowing for more customization
     public AiServices<Assistant> createAssistantX(String modelName) {
 
         String aiModel = modelName != null ? modelName : model;
@@ -150,6 +151,7 @@ public class OllamaManager {
                 .chatLanguageModel(ollama);
     }
 
+    // Just a Simple Response
     public Assistant createAssistant(String modelName) {
 
         String aiModel = modelName != null ? modelName : model;

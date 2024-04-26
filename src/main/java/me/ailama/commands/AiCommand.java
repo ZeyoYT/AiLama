@@ -16,7 +16,9 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class AiCommand implements AiLamaSlashCommand {
 
@@ -96,12 +98,12 @@ public class AiCommand implements AiLamaSlashCommand {
                             You are a helpful AI assistant, you have a score, which can either be good or bad,
                             you need to maintain a good score to be helpful, if you don't maintain a good score then you will be considered unhelpful.
                             
-                            you will try to answer the query as best as you can and only in JSON format, else you will be given a bad score.
+                            you will try to answer the users need as best as you can and only in JSON format, else you will be given a bad score.
                             
                             any of the tools description listed below match the specific needs of the query then use the tool to answer the query,
                             the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
                             
-                            if the tool description does not specify the query's needs then don't respond using a tool else you will be given a bad score.
+                            if the tool description does not specify the user's needs then don't respond using a tool else you will be given a bad score.
                             
                             finally if a tool is matched then give response using following schema:
                             
@@ -118,12 +120,22 @@ public class AiCommand implements AiLamaSlashCommand {
                             
                             and if you don't follow the schema, you will be given a bad score, but if you follow the schema, you will be given a good score.
                             
-                            if you don't find a tool that match the requirements of the query then respond with the query itself. using the following schema:
+                            if you don't find a tool that match the requirements of the user then respond to the user normally,
+                            and also make the response to be encoded for the JSON format or you will be given a bad score,
+                            and use the following schema:
                             
                             {
                                 "tooled": false,
-                                "response": "response"
+                                "response": [
+                                    "paragraph",
+                                    "paragraph",
+                                    ...
+                                ]
                             }
+                            
+                            in the above schema, the response is an array of paragraphs that you want to respond to the user, minimum of 1 paragraph.
+                            each new paragraph should be a new string in the array.
+                            between each paragraph, there should be '\\n'.
                             
                             the tools are: %s
                             """,tools)
@@ -133,13 +145,13 @@ public class AiCommand implements AiLamaSlashCommand {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            String temp = response;
+            String temp = Pattern.compile("(?<=\":\").*(?=\")").matcher(response).replaceAll(x -> x.group().replace("\"", "_QUOTE_") );
 
             try {
-                Tool tooled = mapper.readValue(response, Tool.class);
+                Tool tooled = mapper.readValue(temp, Tool.class);
 
                 if(!tooled.tooled) {
-                    response = tooled.response;
+                    response = String.join("\n", tooled.response);
                 }
                 else
                 {
@@ -147,6 +159,7 @@ public class AiCommand implements AiLamaSlashCommand {
                 }
             }
             catch (Exception ignore) {
+                System.out.println(ignore.getMessage());
                 response = temp;
             }
 

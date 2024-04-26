@@ -11,5 +11,7 @@ public class Tool {
     public String name;
 
     public HashMap<String, Object> arguments;
-    public String response;
+
+
+    public String[] response;
 }
