@@ -1,5 +1,9 @@
 package me.ailama.main;
 
+import me.ailama.handler.annotations.Tool;
+import me.ailama.handler.annotations.Args;
+
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +20,17 @@ public class AiLama
         return string.substring(0, 1).toUpperCase() + string.substring(1);
     }
 
+    @Tool(name = "add", description = "Addition ('+') of two numbers like N1+N2", arguments = {
+            @Args(name = "a", Type = "int"),
+            @Args(name = "b", Type = "int")
+    })
+    public String add(int a, int b) {
+        return String.valueOf(a + b);
+    }
+
     public String formatTime(final long timeInMillis) {
+
+        Main.LOGGER.info("Formatting time from milliseconds to a readable format");
 
         int seconds = (int) (timeInMillis / 1000) % 60;
         int minutes = (int) ((timeInMillis / (1000*60)) % 60);

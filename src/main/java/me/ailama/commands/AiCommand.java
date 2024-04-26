@@ -1,9 +1,11 @@
 package me.ailama.commands;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.commandhandler.SearXNGManager;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import me.ailama.handler.interfaces.Assistant;
+import me.ailama.handler.other.Tool;
 import me.ailama.main.AiLama;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.IntegrationType;
@@ -13,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AiCommand implements AiLamaSlashCommand {
@@ -83,8 +86,68 @@ public class AiCommand implements AiLamaSlashCommand {
         }
         else
         {
+            String tools = String.format("tools = %s",OllamaManager.getInstance().getFinalJson().build());
+
             // generate normal response based on the query if the url option is not provided or the web option is not provided
-            response = OllamaManager.getInstance().createAssistant(modelOption).answer(queryOption);
+            response = OllamaManager.getInstance().
+                    createAssistantX(modelOption)
+                    .systemMessageProvider(x ->
+                        String.format("""
+                            You are a helpful AI assistant, you have a score, which can either be good or bad,
+                            you need to maintain a good score to be helpful, if you don't maintain a good score then you will be considered unhelpful.
+                            
+                            you will try to answer the query as best as you can and only in JSON format, else you will be given a bad score.
+                            
+                            any of the tools description listed below match the specific needs of the query then use the tool to answer the query,
+                            the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
+                            
+                            if the tool description does not specify the query's needs then don't respond using a tool else you will be given a bad score.
+                            
+                            finally if a tool is matched then give response using following schema:
+                            
+                            {
+                                "tooled": true,
+                                "name": "tool_name",
+                                "arguments": {
+                                    "argument_name": "value",
+                                    "argument_name": "value"
+                                    ...
+                                },
+                                "reason": "detailed_reason_for_using_tool"
+                            }
+                            
+                            and if you don't follow the schema, you will be given a bad score, but if you follow the schema, you will be given a good score.
+                            
+                            if you don't find a tool that match the requirements of the query then respond with the query itself. using the following schema:
+                            
+                            {
+                                "tooled": false,
+                                "response": "response"
+                            }
+                            
+                            the tools are: %s
+                            """,tools)
+                    )
+                    .build()
+                    .answer(queryOption);
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            try {
+                Tool tooled = mapper.readValue(response, Tool.class);
+
+                if(!tooled.tooled) {
+                    response = tooled.response;
+                }
+                else
+                {
+                    response = OllamaManager.getInstance().executeTool(tooled.name, tooled.arguments.values().toArray()).toString();
+                }
+            }
+            catch (Exception ignore) {
+
+            }
+
         }
 
 

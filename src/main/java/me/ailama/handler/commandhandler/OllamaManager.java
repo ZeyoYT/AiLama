@@ -13,20 +13,28 @@ import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import me.ailama.config.Config;
+import me.ailama.handler.JsonBuilder.JsonArray;
+import me.ailama.handler.JsonBuilder.JsonObject;
+import me.ailama.handler.annotations.Tool;
 import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
 import org.jsoup.Jsoup;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class OllamaManager {
 
+    public static final double TEMPERATURE = 0.4;
     private static OllamaManager ollama;
 
     private final String url;
     private final String model;
     private final String embeddingModel;
+
+    private final HashMap<String,Object> tools;
 
     public OllamaManager() {
 
@@ -34,14 +42,119 @@ public class OllamaManager {
         model = Config.get("OLLAMA_MODEL");
         embeddingModel = Config.get("OLLAMA_EMBEDDING_MODEL");
 
+        tools = new HashMap<>();
+
+        addTool(AiLama.getInstance());
+    }
+
+    public void addTool(Object tool) {
+
+        if(tools.containsValue(tool)) {
+            throw new IllegalArgumentException("Tool already exists");
+        }
+
+        getMethodsAnnotated(tool.getClass()).forEach(method -> {
+            try {
+                tools.put(method.getName(),tool);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public JsonArray getFinalJson() {
+        JsonArray toolJsonArray = new JsonArray();
+
+        List<JsonObject> toolJsonObjects = new ArrayList<>();
+        for (Object tool : tools.values()) {
+            for (Method method : getMethodsAnnotated(tool.getClass())) {
+                Tool toolAnnotation = method.getAnnotation(Tool.class);
+
+                JsonObject object = new JsonObject()
+                        .add("name",toolAnnotation.name())
+                        .add("description",toolAnnotation.description());
+
+                if(toolAnnotation.arguments().length > 0) {
+                    JsonObject arguments = new JsonObject();
+                    for (int i = 0; i < toolAnnotation.arguments().length; i++) {
+
+                        arguments.add("name",toolAnnotation.arguments()[i].name())
+                                .add("type",toolAnnotation.arguments()[i].Type())
+                                .add("value", "change_me");
+
+                    }
+                    object.add("arguments",arguments);
+                }
+
+                toolJsonObjects.add(object);
+            }
+        }
+
+        return toolJsonArray.objects(toolJsonObjects);
+    }
+
+    public Object executeTool(String toolName, Object... args) {
+
+        Object tool = tools.get(toolName);
+
+        if(tool == null) {
+            return null;
+        }
+
+        for (Method method : getMethodsAnnotated(tool.getClass())) {
+            if(method.getName().equals(toolName)) {
+                try {
+                    return method.invoke(tool,args);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static List<Method> getMethodsAnnotated(final Class<?> type) {
+        final List<Method> methods = new ArrayList<>();
+        Class<?> klass = type;
+        while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
+            // iterate though the list of methods declared in the class represented by klass variable, and add those annotated with the specified annotation
+            for (final Method method : klass.getDeclaredMethods()) {
+                if (method.isAnnotationPresent(Tool.class)) {
+                    methods.add(method);
+                }
+            }
+            // move to the upper class in the hierarchy in search for more methods
+            klass = klass.getSuperclass();
+        }
+        return methods;
     }
 
     // Just a Simple Response
+    public AiServices<Assistant> createAssistantX(String modelName) {
+
+        String aiModel = modelName != null ? modelName : model;
+
+        OllamaChatModel ollama = OllamaChatModel.builder()
+                .baseUrl(url)
+                .modelName(aiModel)
+                .temperature(TEMPERATURE)
+                .format("json")
+                .build();
+
+        return AiServices.builder(Assistant.class)
+                .chatLanguageModel(ollama);
+    }
+
     public Assistant createAssistant(String modelName) {
 
         String aiModel = modelName != null ? modelName : model;
 
-        OllamaChatModel ollama = OllamaChatModel.builder().baseUrl(url).modelName(aiModel).temperature(0.4).build();
+        OllamaChatModel ollama = OllamaChatModel.builder()
+                .baseUrl(url)
+                .modelName(aiModel)
+                .temperature(TEMPERATURE)
+                .build();
 
         return AiServices.builder(Assistant.class)
                 .chatLanguageModel(ollama)
@@ -72,7 +185,11 @@ public class OllamaManager {
                 .minScore(0.6)
                 .build();
 
-        OllamaChatModel ollama = OllamaChatModel.builder().baseUrl(url).modelName(aiModel).temperature(0.4).build();
+        OllamaChatModel ollama = OllamaChatModel.builder()
+                .baseUrl(url)
+                .modelName(aiModel)
+                .temperature(TEMPERATURE)
+                .build();
 
         AiServices<Assistant> assistantAiServices = AiServices.builder(Assistant.class)
                 .chatLanguageModel(ollama)
@@ -86,6 +203,7 @@ public class OllamaManager {
                 .build();
     }
 
+    // Response Based on Provided URL
     public Assistant urlAssistant(List<String> url, String model) {
 
         List<Document> documents = new ArrayList<>();
