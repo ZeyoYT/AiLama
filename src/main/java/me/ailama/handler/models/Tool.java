@@ -1,4 +1,4 @@
-package me.ailama.handler.other;
+package me.ailama.handler.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

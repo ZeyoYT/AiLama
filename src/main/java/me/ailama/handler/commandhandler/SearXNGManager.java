@@ -3,8 +3,8 @@ package me.ailama.handler.commandhandler;
 import com.drew.lang.annotations.Nullable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.ailama.config.Config;
-import me.ailama.handler.other.SearXNG;
-import me.ailama.handler.other.SearXNGResult;
+import me.ailama.handler.models.SearXNG;
+import me.ailama.handler.models.SearXNGResult;
 import me.ailama.main.AiLama;
 import me.ailama.main.Main;
 import okhttp3.OkHttpClient;
@@ -13,7 +13,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class SearXNGManager {
 

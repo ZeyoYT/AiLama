@@ -5,7 +5,7 @@ import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.commandhandler.SearXNGManager;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import me.ailama.handler.interfaces.Assistant;
-import me.ailama.handler.other.Tool;
+import me.ailama.handler.models.Tool;
 import me.ailama.main.AiLama;
 import me.ailama.main.Main;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

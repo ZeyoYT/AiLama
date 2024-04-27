@@ -20,6 +20,10 @@ import me.ailama.handler.annotations.Tool;
 import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
 import me.ailama.main.Main;
+import me.ailama.tools.ApiTools;
+import me.ailama.tools.MathTools;
+import me.ailama.tools.TimeTools;
+import me.ailama.tools.UtilityTools;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
@@ -40,6 +44,8 @@ public class OllamaManager {
 
     private final HashMap<String,Method> tools;
 
+    private final HashMap<Class<?>, ArrayList<String>> classInstanceMap;
+
     public OllamaManager() {
 
         url = AiLama.getInstance().fixUrl(Config.get("OLLAMA_URL") + ":" + Config.get("OLLAMA_PORT"));
@@ -47,11 +53,19 @@ public class OllamaManager {
         embeddingModel = Config.get("OLLAMA_EMBEDDING_MODEL");
 
         tools = new HashMap<>();
+        classInstanceMap = new HashMap<>();
 
         addTool(AiLama.getInstance());
+        addTool(new MathTools());
+        addTool(new ApiTools());
+        addTool(new TimeTools());
+        addTool(new UtilityTools());
     }
 
     public void addTool(Object toolClass) {
+
+        ArrayList<String> toolsList = new ArrayList<>();
+
         getMethodsAnnotated(toolClass.getClass()).forEach(method -> {
 
             if(method.getReturnType() == void.class) {
@@ -68,11 +82,16 @@ public class OllamaManager {
                     }
 
                     tools.put(name,method);
+                    toolsList.add(name);
                 }
             } catch (Exception e) {
                 Main.LOGGER.error("Error while adding tool: " + e.getMessage());
             }
         });
+
+        if(!toolsList.isEmpty()) {
+            classInstanceMap.put(toolClass.getClass(), toolsList);
+        }
     }
 
     // Get the final JSON of all the tools
@@ -146,6 +165,15 @@ public class OllamaManager {
         return tools.get(toolName);
     }
 
+    public Class<?> getToolClass(String toolName) {
+        for(Class<?> clazz : classInstanceMap.keySet()) {
+            if(classInstanceMap.get(clazz).contains(toolName)) {
+                return clazz;
+            }
+        }
+        return null;
+    }
+
     // Execute the Tool
     public Object executeTool(String toolName, Object... args) {
 
@@ -157,7 +185,7 @@ public class OllamaManager {
                 return null;
             }
 
-            return tool.invoke(AiLama.getInstance(),args);
+            return tool.invoke(getToolClass(toolName).getConstructor().newInstance(), args);
 
         } catch (Exception e) {
             Main.LOGGER.error("Error while executing tool: " + e.getMessage());
