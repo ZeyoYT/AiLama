@@ -141,8 +141,6 @@ public class AiCommand implements AiLamaSlashCommand {
                     .build()
                     .answer(queryOption);
 
-            System.out.println(response);
-
             ObjectMapper mapper = new ObjectMapper();
 
             String temp = Pattern.compile("(?<=\":\").*(?=\")").matcher(response).replaceAll(x -> x.group().replace("\"", "_QUOTE_") );
