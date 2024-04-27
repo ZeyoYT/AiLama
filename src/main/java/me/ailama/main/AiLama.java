@@ -2,8 +2,9 @@ package me.ailama.main;
 
 import me.ailama.handler.annotations.Tool;
 import me.ailama.handler.annotations.Args;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,34 +83,6 @@ public class AiLama
         return String.valueOf(Math.cbrt(a.doubleValue()));
     }
 
-    @Tool(name = "abs", description = "Absolute value of a number like abs(N1)", arguments = {
-            @Args(name = "a", Type = "number")
-    })
-    public String abs(Number a) {
-        return String.valueOf(Math.abs(a.doubleValue()));
-    }
-
-    @Tool(name = "round", description = "Round a number like round(N1)", arguments = {
-            @Args(name = "a", Type = "number")
-    })
-    public String round(Number a) {
-        return String.valueOf(Math.round(a.doubleValue()));
-    }
-
-    @Tool(name = "ceil", description = "Ceil a number like ceil(N1)", arguments = {
-            @Args(name = "a", Type = "number")
-    })
-    public String ceil(Number a) {
-        return String.valueOf(Math.ceil(a.doubleValue()));
-    }
-
-    @Tool(name = "floor", description = "Floor a number like floor(N1)", arguments = {
-            @Args(name = "a", Type = "number")
-    })
-    public String floor(Number a) {
-        return String.valueOf(Math.floor(a.doubleValue()));
-    }
-
     @Tool(name = "formatTime", description = "Format time from milliseconds to a readable format like formatTime(N1)", arguments = {
             @Args(name = "timeInMillis", Type = "number")
     })
@@ -126,12 +99,26 @@ public class AiLama
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
-
+    @Tool(name = "fixUrl", description = "Fix a URL if it doesn't start with 'http://' or 'https://'", arguments = {
+            @Args(name = "url", Type = "string")
+    })
     public String fixUrl(String url) {
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             return "https://" + url;
         }
         return url;
+    }
+
+    @Tool(name = "time", description = "Get the current time in a specific timezone like time(is24Hour, timeZone)", arguments = {
+            @Args(name = "is24Hour", Type = "boolean", description = "true for 24-hour format, false for 12-hour format"),
+            @Args(name = "timeZone", Type = "string", description = "Timezone in which you want to get the time like 'Asia/Kolkata'")
+    })
+    public String time(boolean is24Hour, String timeZone) {
+        DateTime dateTime = new DateTime();
+        if (timeZone != null) {
+            dateTime = dateTime.withZone(DateTimeZone.forID(timeZone));
+        }
+        return dateTime.toString(is24Hour ? "HH:mm:ss" : "hh:mm:ss a");
     }
 
     public List<String> getParts(final String string, final int partitionSize) {

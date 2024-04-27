@@ -15,8 +15,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -112,7 +110,6 @@ public class AiCommand implements AiLamaSlashCommand {
                                 "name": "tool_name",
                                 "arguments": {
                                     "argument_name": "value",
-                                    "argument_name": "value"
                                     ...
                                 },
                                 "reason": "detailed_reason_for_using_tool"

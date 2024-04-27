@@ -63,6 +63,7 @@ public class OllamaManager {
         });
     }
 
+    // Get the final JSON of all the tools
     public JsonArray getFinalJson() {
         JsonArray toolJsonArray = new JsonArray();
 
@@ -75,17 +76,26 @@ public class OllamaManager {
                     .add("name",toolAnnotation.name())
                     .add("description",toolAnnotation.description());
 
+            // Add Arguments if there are any
             if(toolAnnotation.arguments().length > 0) {
                 JsonObject arguments = new JsonObject();
+
+                // Add the arguments to the JSON
                 for (int i = 0; i < toolAnnotation.arguments().length; i++) {
 
                     arguments.add("name",toolAnnotation.arguments()[i].name())
                             .add("type",toolAnnotation.arguments()[i].Type());
 
+                    if(!toolAnnotation.arguments()[i].description().isEmpty()) {
+                        arguments.add("description",toolAnnotation.arguments()[i].description());
+                    }
+
                 }
+
                 object.add("arguments",arguments);
             }
 
+            // Add the tool object to the array
             toolJsonObjects.add(object);
         });
 
@@ -93,10 +103,12 @@ public class OllamaManager {
         return toolJsonArray.objects(toolJsonObjects);
     }
 
+    // Get the Tool Method
     public Method getTool(String toolName) {
         return tools.get(toolName);
     }
 
+    // Execute the Tool
     public Object executeTool(String toolName, Object... args) {
 
         try {
