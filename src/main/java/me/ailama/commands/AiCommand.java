@@ -7,6 +7,7 @@ import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import me.ailama.handler.interfaces.Assistant;
 import me.ailama.handler.other.Tool;
 import me.ailama.main.AiLama;
+import me.ailama.main.Main;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.IntegrationType;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
@@ -140,6 +141,8 @@ public class AiCommand implements AiLamaSlashCommand {
                     .build()
                     .answer(queryOption);
 
+            System.out.println(response);
+
             ObjectMapper mapper = new ObjectMapper();
 
             String temp = Pattern.compile("(?<=\":\").*(?=\")").matcher(response).replaceAll(x -> x.group().replace("\"", "_QUOTE_") );
@@ -155,8 +158,9 @@ public class AiCommand implements AiLamaSlashCommand {
                     response = OllamaManager.getInstance().executeTool(tooled.name, tooled.arguments.values().toArray()).toString();
                 }
             }
-            catch (Exception ignore) {
+            catch (Exception e) {
                 response = temp;
+                Main.LOGGER.warn("Error while executing tool: " + e.getMessage());
             }
 
         }

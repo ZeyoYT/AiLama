@@ -56,7 +56,9 @@ public class OllamaManager {
 
         getMethodsAnnotated(tool.getClass()).forEach(method -> {
             try {
-                tools.put(method.getName(),method);
+                if(method.isAnnotationPresent(Tool.class)) {
+                    tools.put(method.getAnnotation(Tool.class).name(),method);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
