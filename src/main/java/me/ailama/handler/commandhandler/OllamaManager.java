@@ -1,5 +1,6 @@
 package me.ailama.handler.commandhandler;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
@@ -19,6 +20,8 @@ import me.ailama.handler.annotations.Tool;
 import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
 import me.ailama.main.Main;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 
 import java.lang.reflect.Method;
@@ -48,19 +51,26 @@ public class OllamaManager {
         addTool(AiLama.getInstance());
     }
 
-    public void addTool(Object tool) {
+    public void addTool(Object toolClass) {
+        getMethodsAnnotated(toolClass.getClass()).forEach(method -> {
 
-        if(tools.containsValue(tool)) {
-            throw new IllegalArgumentException("Tool already exists");
-        }
+            if(method.getReturnType() == void.class) {
+                throw new IllegalArgumentException("Tool method must have a return type");
+            }
 
-        getMethodsAnnotated(tool.getClass()).forEach(method -> {
             try {
                 if(method.isAnnotationPresent(Tool.class)) {
-                    tools.put(method.getAnnotation(Tool.class).name(),method);
+
+                    String name = method.getAnnotation(Tool.class).name();
+
+                    if(tools.containsKey(name)) {
+                        throw new IllegalArgumentException("Tool name already exists");
+                    }
+
+                    tools.put(name,method);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Main.LOGGER.error("Error while adding tool: " + e.getMessage());
             }
         });
     }
@@ -80,20 +90,28 @@ public class OllamaManager {
 
             // Add Arguments if there are any
             if(toolAnnotation.arguments().length > 0) {
-                JsonObject arguments = new JsonObject();
+                JsonArray arguments = new JsonArray();
+                ArrayList<JsonObject> argumentJsonObjects = new ArrayList<>();
 
                 // Add the arguments to the JSON
                 for (int i = 0; i < toolAnnotation.arguments().length; i++) {
 
-                    arguments.add("name",toolAnnotation.arguments()[i].name())
+                    JsonObject argument = new JsonObject();
+
+                    argument.add("name",toolAnnotation.arguments()[i].name())
                             .add("type",toolAnnotation.arguments()[i].Type());
 
                     if(!toolAnnotation.arguments()[i].description().isEmpty()) {
-                        arguments.add("description",toolAnnotation.arguments()[i].description());
+
+                        StringBuilder description = getStringBuilder(toolAnnotation, i);
+
+                        argument.add("description",description.toString().trim());
                     }
 
+                    argumentJsonObjects.add(argument);
                 }
 
+                arguments.objects(argumentJsonObjects);
                 object.add("arguments",arguments);
             }
 
@@ -103,6 +121,24 @@ public class OllamaManager {
 
 
         return toolJsonArray.objects(toolJsonObjects);
+    }
+
+    @NotNull
+    private static StringBuilder getStringBuilder(Tool toolAnnotation, int i) {
+        StringBuilder description = new StringBuilder();
+        description.append(toolAnnotation.arguments()[i].description());
+
+        // if No Null
+        if(toolAnnotation.arguments()[i].noNull()) {
+            description.append(" NOT_NULL ");
+        }
+
+        // if Required
+        if(toolAnnotation.arguments()[i].required()) {
+            description.append(" REQUIRED ");
+        }
+
+        return description;
     }
 
     // Get the Tool Method
@@ -123,11 +159,9 @@ public class OllamaManager {
 
             return tool.invoke(AiLama.getInstance(),args);
 
-        } catch (Exception ignore) {
-
-            System.out.println("Error while executing tool: " + ignore.getMessage());
+        } catch (Exception e) {
+            Main.LOGGER.error("Error while executing tool: " + e.getMessage());
             return null;
-
         }
     }
 

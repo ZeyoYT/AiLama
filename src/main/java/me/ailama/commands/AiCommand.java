@@ -102,8 +102,6 @@ public class AiCommand implements AiLamaSlashCommand {
                             any of the tools description listed below match the specific needs of the query then use the tool to answer the query,
                             the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
                             
-                            if the tool description does not specify the user's needs then don't respond using a tool else you will be given a bad score.
-                            
                             finally if a tool is matched then give response using following schema:
                             
                             {
@@ -115,6 +113,15 @@ public class AiCommand implements AiLamaSlashCommand {
                                 },
                                 "reason": "detailed_reason_for_using_tool"
                             }
+                            
+                            the tool_name is the name of the tool that you are using, the arguments are the arguments that you are passing to the tool.
+                            
+                            following are the rules for tools:
+                            if the tool description does not specify the user's needs then don't respond using a tool else you will be given a bad score.
+                            if you don't pass the required arguments to the tool then you will be given a bad score.
+                            if you pass a null value to a argument that specified NOT_NULL in its description then you will be given a bad score.
+                            if you don't respect the arguments data type, you will be given a bad score.
+                            if you don't respect the arguments description, you will be given a bad score.
                             
                             and if you don't follow the schema, you will be given a bad score, but if you follow the schema, you will be given a good score.
                             
@@ -135,7 +142,7 @@ public class AiCommand implements AiLamaSlashCommand {
                             each new paragraph should be a new string in the array.
                             between each paragraph, there should be '\\n'.
                             
-                            the tools are: %s
+                            %s
                             """,tools)
                     )
                     .build()

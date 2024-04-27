@@ -3,13 +3,11 @@ package me.ailama.main;
 import me.ailama.handler.annotations.Tool;
 import me.ailama.handler.annotations.Args;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.ResponseBody;
+import okhttp3.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +17,6 @@ public class AiLama
 
     public AiLama() {
 
-    }
-
-    public String capitalizeFirstLetter(String string) {
-        return string.substring(0, 1).toUpperCase() + string.substring(1);
     }
 
     @Tool(name = "add", description = "Addition ('+') of two numbers like N1+N2", arguments = {
@@ -80,10 +74,10 @@ public class AiLama
         return String.valueOf(Math.sqrt(a.doubleValue()));
     }
 
-    @Tool(name = "cbrt", description = "Cube root of a number like cbrt(N1)", arguments = {
+    @Tool(name = "cubeRoot", description = "Cube root of a number", arguments = {
             @Args(name = "a", Type = "number")
     })
-    public String cbrt(Number a) {
+    public String cubeRoot(Number a) {
         return String.valueOf(Math.cbrt(a.doubleValue()));
     }
 
@@ -125,8 +119,8 @@ public class AiLama
         return dateTime.toString(is24Hour ? "HH:mm:ss" : "hh:mm:ss a");
     }
 
-    @Tool(name = "currencyRate", description = "Converts a currency rate to another like currencyRate(amount, currency1, currency2)", arguments = {
-            @Args(name = "amount", Type = "double", description = "Amount to convert"),
+    @Tool(name = "currencyRate", description = "Converts a currency rate to another", arguments = {
+            @Args(name = "amount", Type = "double", description = "Amount to convert", noNull = true),
             @Args(name = "currency1", Type = "string", description = "Currency to convert from, Like INR"),
             @Args(name = "currency2", Type = "string", description = "Currency to convert to, Like USD")
     })
@@ -139,18 +133,26 @@ public class AiLama
     public String getRates(String currency,String currency2) {
         final OkHttpClient okHttpClient = new OkHttpClient();
         String rate = "";
+
         final Request request = new Request.Builder().url("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/" + currency + ".json").build();
 
         try {
-            final ResponseBody responseBody = okHttpClient.newCall(request).execute().body();
+            final Response response = okHttpClient.newCall(request).execute();
+            final ResponseBody responseBody = response.body();
+
             if (responseBody != null) {
+
                 final DataObject dataObject = DataObject.fromJson(responseBody.string());
                 rate = dataObject.getObject(currency).getString(currency2);
+
+                responseBody.close();
             }
+
+            response.close();
             return rate;
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            Main.LOGGER.error("Error while getting currency rate: " + e.getMessage());
             return "0";
         }
     }
@@ -167,7 +169,8 @@ public class AiLama
     })
     public boolean isValidURL(String url) {
         try {
-            new URL(url).toURI();
+            //noinspection ResultOfMethodCallIgnored
+            new URI(url).toURL();
             return true;
         } catch (Exception e) {
             return false;
