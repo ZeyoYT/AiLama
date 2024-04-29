@@ -2,6 +2,7 @@ package me.ailama.handler.commandhandler;
 
 import me.ailama.commands.AiCommand;
 import me.ailama.commands.DocumentCommand;
+import me.ailama.commands.ImageCommand;
 import me.ailama.commands.WebCommand;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -17,9 +18,10 @@ public class CommandRegister {
 
         this.slashCommands = new HashMap<>();
 
-        addCommand(new AiCommand());
-        addCommand(new WebCommand());
-        addCommand(new DocumentCommand());
+        addCommand(new AiCommand(), true);
+        addCommand(new WebCommand(), SearXNGManager.getInstance().isSearXNGEnabled());
+        addCommand(new DocumentCommand(), true);
+        addCommand(new ImageCommand(), Automatic1111Manager.getInstance().isAutomatic1111Enabled());
     }
 
     public AiLamaSlashCommand getCommand(String name) {
@@ -40,7 +42,11 @@ public class CommandRegister {
         return this.slashCommands;
     }
 
-    public void addCommand(AiLamaSlashCommand command) {
+    public void addCommand(AiLamaSlashCommand command, boolean condition) {
+
+        if(!condition) {
+            return;
+        }
 
         if(this.slashCommands.containsKey(command.getCommandData().getName())) {
             throw new IllegalArgumentException("Command with name " + command.getCommandData().getName() + " already exists");

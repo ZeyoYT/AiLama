@@ -5,6 +5,7 @@ import me.ailama.handler.annotations.Args;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import okhttp3.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +60,38 @@ public class AiLama
             parts.add(string.substring(i, Math.min(len, i + partitionSize)));
         }
         return parts;
+    }
+
+    // delay in milliseconds
+    // threadDelay: true if you want to use Thread.sleep() instead of a while loop
+    // logStartEnd: true if you want to log the start and end time
+    public void wait(long delay, boolean threadDelay, boolean logStartEnd) {
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime targetTime = currentTime.plusNanos(delay * 1000000L);
+        if (logStartEnd) {
+            System.out.println(currentTime + " : " + targetTime);
+        }
+
+        if (threadDelay) {
+            try {
+                Thread.sleep(delay);
+                if (logStartEnd) {
+                    System.out.println(targetTime);
+                }
+            } catch (InterruptedException var8) {
+                var8.printStackTrace();
+            }
+
+        } else {
+            while(!currentTime.isEqual(targetTime) && !currentTime.isAfter(targetTime)) {
+                currentTime = LocalDateTime.now();
+            }
+
+            if (logStartEnd) {
+                System.out.println(targetTime);
+            }
+
+        }
     }
 
     public static AiLama getInstance() {

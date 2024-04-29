@@ -31,7 +31,7 @@ public class SearXNGManager {
 
         // If the URL or the Port is not set in the config, it will return null
         if(Config.get("SEARXNG_URL") == null || Config.get("SEARXNG_PORT") == null) {
-            Main.LOGGER.error("SEARXNG_URL or SEARXNG_PORT is not set in the config");
+            Main.LOGGER.warn("SEARXNG_URL or SEARXNG_PORT is not set in the config");
 
             url = null;
             finalUrl = null;
@@ -190,6 +190,10 @@ public class SearXNGManager {
     public void addForbiddenUrl(String url, String reason) {
         forbiddenUrls.add(url);
         Main.LOGGER.info("Added " + url + " to the forbidden list" + (reason != null ? " because " + reason : ""));
+    }
+
+    public boolean isSearXNGEnabled() {
+        return url != null;
     }
 
     public static SearXNGManager getInstance() {
