@@ -45,12 +45,35 @@ Please Read : [Important Things to Consider](#important-things-to-consider-befor
 
 ## Prerequisite
 
+### Ollama :
 - Ollama 0.28 or Greater ( [Download Here](https://ollama.com/download) )
 - Ai Model for Ollama ( [Download Here](https://ollama.com/models) ) [ [llama3](https://ollama.com/library/llama3) Preferred ]
+
+<br>
+
+**_There are Two ways you can use AiLama, by using Docker Image or by Building the Project and Running it_**
+
+### Compile and Run
 - Java 19 or Greater
 - Gradle 7.6 or Greater ( [Download Here](https://gradle.org/) )
-- A Discord App ( make __[New](https://discord.com/developers/applications)__ app from discord developer portal )
-- Optional : SearXNG for Web Search ( [Setup Here](https://github.com/searxng/searxng?tab=readme-ov-file#setup) ) ( [AiLama Guide Here](#searxng-guide) )
+
+### Run without Compiling
+- Docker ( [Download Here](https://www.docker.com/) )
+
+<br>
+
+### Discord App
+- A Discord Bot/App ( make __[New](https://discord.com/developers/applications)__ app from discord developer portal )
+
+<br>
+
+## Optional Prerequisite
+
+### Web Search
+- SearXNG for Web Search ( [Setup Here](https://github.com/searxng/searxng?tab=readme-ov-file#setup) ) ( [Guide by AiLama Here](#searxng-guide) )
+
+### Image Generation
+- Automatic1111 for Image Generation ( [ Download Here ](https://github.com/AUTOMATIC1111/stable-diffusion-webui) )
 
 <br>
 
@@ -180,6 +203,11 @@ services:
       - SEARXNG_URL=<YOUR_SEARXNG_URL>
       - SEARXNG_PORT=<YOUR_SEARXNG_PORT>
       - SEARXNG_ENGINES=<YOUR_SEARXNG_ENGINES>
+      - AUTOMATIC1111_URL=<YOUR_AUTOMATIC1111_URL>
+      - AUTOMATIC1111_PORT=<YOUR_AUTOMATIC1111_PORT>
+      - AUTOMATIC1111_STEPS=<STEPS_FOR_IMAGE_GENERATION>
+      - AUTOMATIC1111_SAMPLER_NAME=<SAMPLER_NAME>
+      - AUTOMATIC1111_SCHEDULER_TYPE=<SCHEDULER_TYPE>
 ```
 #### Run Command :
 ```
@@ -260,8 +288,7 @@ SEARXNG_PORT=<SEARXNG_PORT>
 SEARXNG_ENGINES=<SEARXNG_ENGINES>
 ```
 
-2. Restart the Bot and Now you can use the Web Search FeatureS='SEARCH_ENGINE_HERE, SEARCH_ENGINE_HERE, ...'
-
+2. Restart the Bot and Now you can use the Web Search Feature
 
 <br>
 

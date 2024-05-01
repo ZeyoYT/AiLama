@@ -73,7 +73,7 @@ public class Automatic1111Manager {
             response.close();
         }
         catch (Exception e) {
-            e.printStackTrace();
+            Main.LOGGER.error("Error while generating image: " + e.getMessage());
         }
 
         return null;
