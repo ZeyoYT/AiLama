@@ -75,6 +75,11 @@ public class AiCommand implements AiLamaSlashCommand {
                 tryCountForUrlSearch++;
             }
 
+            if(urlForContent == null) {
+                event.getHook().sendMessage("No proper results were found").setEphemeral(true).queue();
+                return;
+            }
+
         }
 
         if(urlOption != null || urlForContent != null) {
