@@ -38,6 +38,8 @@ public class AiCommand implements AiLamaSlashCommand {
 
     public void handleCommand(SlashCommandInteractionEvent event) {
 
+        int limitCount = 3;
+
         // Defer the reply to avoid timeout and set ephemeral if the option is provided
         if(event.getOption("ephemeral") != null && event.getOption("ephemeral").getAsBoolean()) {
             event.deferReply(true).queue();
@@ -63,11 +65,14 @@ public class AiCommand implements AiLamaSlashCommand {
         // if the web option is provided, get the url from the search
         if(event.getOption("web") != null && event.getOption("web").getAsBoolean()) {
 
-            urlForContent = SearXNGManager.getInstance().getUrlFromSearch(queryOption);
+            int tryCountForUrlSearch = 0;
 
-            if(urlForContent == null) {
-                event.getHook().sendMessage("No proper results were found").setEphemeral(true).queue();
-                return;
+            while (tryCountForUrlSearch < limitCount) {
+                urlForContent = SearXNGManager.getInstance().getUrlFromSearch(queryOption);
+                if(urlForContent != null) {
+                    break;
+                }
+                tryCountForUrlSearch++;
             }
 
         }
