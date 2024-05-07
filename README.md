@@ -39,13 +39,15 @@ Please Read : [Important Things to Consider](#important-things-to-consider-befor
 - Normal Document Support
 - can be used anywhere in discord where user installable apps are supported
 - you can run you query by a different model on the fly using the model's field ( example below )
-- URL RAG supported, where you can provide a url in the URL Option and the bot will take the Website as a context
 
 <br>
 
 ## Prerequisite
 
 ### Ollama :
+
+_Ollama is an open-source app that lets you run, create, and share large language models locally with a command-line interface_
+
 - Ollama 0.28 or Greater ( [Download Here](https://ollama.com/download) )
 - Ai Model for Ollama ( [Download Here](https://ollama.com/models) ) [ [llama3](https://ollama.com/library/llama3) Preferred ]
 
@@ -68,6 +70,8 @@ Please Read : [Important Things to Consider](#important-things-to-consider-befor
 <br>
 
 ## Optional Prerequisite
+
+_These are Optional Prerequisite, you can use the bot without them, but to get access to more features its recommended to install the following programs_
 
 ### Web Search
 - SearXNG for Web Search ( [Setup Here](https://github.com/searxng/searxng?tab=readme-ov-file#setup) ) ( [Guide by AiLama Here](#searxng-guide) )
