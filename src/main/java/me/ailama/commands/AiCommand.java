@@ -132,6 +132,7 @@ public class AiCommand implements AiLamaSlashCommand {
                             if you pass a null value to a argument that specified NOT_NULL in its description then you will be given a bad score.
                             if you don't respect the arguments data type, you will be given a bad score.
                             if you don't respect the arguments description, you will be given a bad score.
+                            the reason should not exceed 200 characters, and if it does, you will be given a bad score.
                             
                             and if you don't follow the schema, you will be given a bad score, but if you follow the schema, you will be given a good score.
                             
