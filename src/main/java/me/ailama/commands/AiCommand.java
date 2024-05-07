@@ -48,6 +48,8 @@ public class AiCommand implements AiLamaSlashCommand {
             event.deferReply().queue();
         }
 
+        AiLama.getInstance().startTimer();
+
         // Set Configurations
         String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
         String queryOption = event.getOption("ask").getAsString();
@@ -97,66 +99,9 @@ public class AiCommand implements AiLamaSlashCommand {
         }
         else
         {
-            String tools = String.format("tools = %s",OllamaManager.getInstance().getFinalJson().build());
-
             // generate normal response based on the query if the url option is not provided or the web option is not provided
             response = OllamaManager.getInstance().
-                    createAssistantX(modelOption)
-                    .systemMessageProvider(x ->
-                        String.format("""
-                            You are a helpful AI assistant, you have a score, which can either be good or bad,
-                            you need to maintain a good score to be helpful, if you don't maintain a good score then you will be considered unhelpful.
-                            
-                            you will try to answer the users need as best as you can and only in JSON format, else you will be given a bad score.
-                            
-                            any of the tools description listed below match the specific needs of the query then use the tool to answer the query,
-                            the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
-                            
-                            finally if a tool is matched then give response using following schema:
-                            
-                            {
-                                "tooled": true,
-                                "name": "tool_name",
-                                "arguments": {
-                                    "argument_name": "value",
-                                    ...
-                                },
-                                "reason": "detailed_reason_for_using_tool"
-                            }
-                            
-                            the tool_name is the name of the tool that you are using, the arguments are the arguments that you are passing to the tool.
-                            
-                            following are the rules for tools:
-                            if the tool description does not specify the user's needs then don't respond using a tool else you will be given a bad score.
-                            if you don't pass the required arguments to the tool then you will be given a bad score.
-                            if you pass a null value to a argument that specified NOT_NULL in its description then you will be given a bad score.
-                            if you don't respect the arguments data type, you will be given a bad score.
-                            if you don't respect the arguments description, you will be given a bad score.
-                            the reason should not exceed 200 characters, and if it does, you will be given a bad score.
-                            
-                            and if you don't follow the schema, you will be given a bad score, but if you follow the schema, you will be given a good score.
-                            
-                            if you don't find a tool that match the requirements of the user then respond to the user normally,
-                            and also make the response to be encoded for the JSON format or you will be given a bad score,
-                            and use the following schema:
-                            
-                            {
-                                "tooled": false,
-                                "response": [
-                                    "paragraph",
-                                    "paragraph",
-                                    ...
-                                ]
-                            }
-                            
-                            in the above schema, the response is an array of paragraphs that you want to respond to the user, minimum of 1 paragraph.
-                            each new paragraph should be a new string in the array.
-                            between each paragraph, there should be '\\n'.
-                            
-                            %s
-                            """,tools)
-                    )
-                    .build()
+                    getTooledAssistant(modelOption)
                     .answer(queryOption);
 
             ObjectMapper mapper = new ObjectMapper();

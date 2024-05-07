@@ -4,6 +4,7 @@ import me.ailama.handler.annotations.Tool;
 import me.ailama.handler.annotations.Args;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import okhttp3.*;
+import org.joda.time.DateTime;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import java.util.List;
 public class AiLama
 {
     private static AiLama INSTANCE;
+
+    private DateTime starterTime;
 
     public AiLama() {
 
@@ -92,6 +95,14 @@ public class AiLama
             }
 
         }
+    }
+
+    public void startTimer() {
+        this.starterTime = DateTime.now();
+    }
+
+    public long getElapsedTime() {
+        return DateTime.now().getMillis() - this.starterTime.getMillis();
     }
 
     public static AiLama getInstance() {

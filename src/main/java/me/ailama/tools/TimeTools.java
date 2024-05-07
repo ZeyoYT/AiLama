@@ -23,7 +23,7 @@ public class TimeTools {
             return String.format("%02d:%02d:%02d", hours, minutes, seconds);
         }
 
-        @Tool(name = "time", description = "Get the current time in a specific timezone time(is24Hour, timeZone)", arguments = {
+        @Tool(name = "time", description = "Get the current time", arguments = {
                 @Args(name = "is24Hour", Type = "boolean", description = "true for 24-hour format, false for 12-hour format"),
                 @Args(name = "timeZone", Type = "string", description = "Timezone in which you want to get the time like 'Asia/Kolkata'")
         })
@@ -32,6 +32,7 @@ public class TimeTools {
             if (timeZone != null) {
                 dateTime = dateTime.withZone(DateTimeZone.forID(timeZone));
             }
+
             return dateTime.toString(is24Hour ? "HH:mm:ss" : "hh:mm:ss a");
         }
 

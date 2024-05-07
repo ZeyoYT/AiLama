@@ -9,4 +9,6 @@ public @interface Tool {
     String description();
 
     Args[] arguments();
+
+    ResponseFormatter responseFormatter() default @ResponseFormatter(responseOrder = {}, responseVariables = {}, preFormattedResponse = "", isPreFormatted = false, isResponseOrder = false);
 }

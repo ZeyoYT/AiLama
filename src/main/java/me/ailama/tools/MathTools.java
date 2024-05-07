@@ -1,14 +1,23 @@
 package me.ailama.tools;
 
 import me.ailama.handler.annotations.Args;
+import me.ailama.handler.annotations.ResponseFormatter;
 import me.ailama.handler.annotations.Tool;
 
 public class MathTools {
 
-    @Tool(name = "add", description = "Addition ('+') of two numbers like N1+N2", arguments = {
-            @Args(name = "a", Type = "number"),
-            @Args(name = "b", Type = "number")
-    })
+    @Tool(name = "add", description = "Addition ('+') of two numbers like N1+N2",
+        arguments = {
+                @Args(name = "a", Type = "number"),
+                @Args(name = "b", Type = "number")
+        },
+        responseFormatter = @ResponseFormatter(
+            responseOrder = {"result"},
+            responseVariables = {"result"},
+            isPreFormatted = true,
+            isResponseOrder = true
+        )
+    )
     public String add(Number a, Number b) {
         return String.valueOf(a.doubleValue() + b.doubleValue());
     }
