@@ -104,6 +104,8 @@ public class AiCommand implements AiLamaSlashCommand {
                     getTooledAssistant(modelOption)
                     .answer(queryOption);
 
+            System.out.println(response);
+
             ObjectMapper mapper = new ObjectMapper();
 
             String temp = Pattern.compile("(?<=\":\").*(?=\")").matcher(response).replaceAll(x -> x.group().replace("\"", "_QUOTE_") );
@@ -112,7 +114,7 @@ public class AiCommand implements AiLamaSlashCommand {
                 Tool tooled = mapper.readValue(temp, Tool.class);
 
                 if(!tooled.tooled) {
-                    response = String.join("\n", tooled.response);
+                    response = String.join("\n\n", tooled.response);
                 }
                 else
                 {
@@ -152,7 +154,8 @@ public class AiCommand implements AiLamaSlashCommand {
         {
             event.getHook().sendMessage(response).queue();
         }
-    }
 
+        System.out.println(AiLama.getInstance().getElapsedTime());
+    }
 
 }
