@@ -173,6 +173,9 @@ WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 1. The Response will vary from model to model
 2. URL RAG might not work with smaller models that support less context window
 3. Only supports Ollama right now
+4. Memory of previous conversation resets on restart
+
+> **Note:** Dot Query ( use function to get accurate response ) does not support memory, so it will not work with the previous conversation
 
 <br>
 

@@ -32,6 +32,7 @@ public class AiCommand implements AiLamaSlashCommand {
                 .addOption(OptionType.STRING, "model", "Example (gemma:2b)", false)
                 .addOption(OptionType.BOOLEAN, "ephemeral", "If you want the response to be ephemeral", false)
                 .addOption(OptionType.STRING, "url", "The Url of website for RAG", false)
+                .addOption(OptionType.BOOLEAN, "reset-session", "If you want reset chat memory", false)
 
                 .setNSFW(false);
     }
@@ -48,15 +49,18 @@ public class AiCommand implements AiLamaSlashCommand {
             event.deferReply().queue();
         }
 
-        AiLama.getInstance().startTimer();
-
         // Set Configurations
         String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
         String queryOption = event.getOption("ask").getAsString();
         String urlOption = event.getOption("url") != null ? event.getOption("url").getAsString() : null;
+        boolean resetSession = event.getOption("reset-session") != null && event.getOption("reset-session").getAsBoolean();
 
         String response = "";
         String urlForContent = null;
+
+        if(resetSession) {
+            OllamaManager.getInstance().getChatMemory().clear();
+        }
 
         // Check if the web option and url option are provided at the same time
         if(event.getOption("web") != null && event.getOption("web").getAsBoolean() && urlOption != null) {
@@ -112,8 +116,6 @@ public class AiCommand implements AiLamaSlashCommand {
                         .chat(queryOption);
             }
 
-            System.out.println(response);
-
             if(isTooledQuery) {
                 ObjectMapper mapper = new ObjectMapper();
 
@@ -167,8 +169,6 @@ public class AiCommand implements AiLamaSlashCommand {
         {
             event.getHook().sendMessage(response).queue();
         }
-
-        System.out.println(AiLama.getInstance().getElapsedTime());
     }
 
 }

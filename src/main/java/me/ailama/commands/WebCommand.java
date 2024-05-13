@@ -28,6 +28,7 @@ public class WebCommand implements AiLamaSlashCommand {
                 .addOption(OptionType.INTEGER, "limit", "The limit of search results", false)
                 .addOption(OptionType.BOOLEAN, "ephemeral", "If you want the response to be ephemeral", false)
                 .addOption(OptionType.STRING, "model", "Example (gemma:2b)", false)
+                .addOption(OptionType.BOOLEAN, "reset-session", "If you want reset chat memory", false)
 
                 .setNSFW(false);
     }
@@ -46,7 +47,13 @@ public class WebCommand implements AiLamaSlashCommand {
         String queryOption = event.getOption("search").getAsString();
         String instructionOption = event.getOption("instructions") != null ? event.getOption("instructions").getAsString() : null;
         String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
+        boolean resetSession = event.getOption("reset-session") != null && event.getOption("reset-session").getAsBoolean();
+
         int limitOption = event.getOption("limit") != null ? event.getOption("limit").getAsInt() : 1;
+
+        if(resetSession) {
+            OllamaManager.getInstance().getChatMemory().clear();
+        }
 
         if(limitOption < 1) {
             event.getHook().sendMessage("Limit should be greater than 0").setEphemeral(true).queue();

@@ -34,6 +34,7 @@ public class DocumentCommand implements AiLamaSlashCommand {
                 .addOption(OptionType.STRING, "instructions", "additional instructions after getting search result", false)
                 .addOption(OptionType.STRING, "model", "Example (gemma:2b)", false)
                 .addOption(OptionType.BOOLEAN, "ephemeral", "If you want the response to be ephemeral", false)
+                .addOption(OptionType.BOOLEAN, "reset-session", "If you want reset chat memory", false)
 
                 .setNSFW(false);
     }
@@ -52,16 +53,20 @@ public class DocumentCommand implements AiLamaSlashCommand {
         // Set Configurations
         String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
         String instructionOption = event.getOption("instructions") != null ? event.getOption("instructions").getAsString() : null;
+        boolean resetSession = event.getOption("reset-session") != null && event.getOption("reset-session").getAsBoolean();
 
         // Get the document
         Message.Attachment document = event.getOption("document").getAsAttachment();
+
+        if(resetSession) {
+            OllamaManager.getInstance().getChatMemory().clear();
+        }
 
         // check if document provided is a text based document like .txt .docx .pdf etc
         if(!getSupportedExtensions().contains(document.getFileExtension())) {
             event.getHook().sendMessage("You can only provide text based documents like .txt, .docx, .pdf").setEphemeral(true).queue();
             return;
         }
-
 
         String response;
 

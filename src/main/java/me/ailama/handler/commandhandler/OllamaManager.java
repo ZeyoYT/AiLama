@@ -294,11 +294,13 @@ public class OllamaManager {
                 )
                 .build();
 
-        System.out.println(tools);
-
         isTooledAssistant = true;
 
         return assistant;
+    }
+
+    public ChatMemory getChatMemory() {
+        return chatMemory;
     }
 
     // Returns a custom Assistant that uses the provided model, allowing for more customization
@@ -321,8 +323,6 @@ public class OllamaManager {
 
     // Just a Simple Response
     public Assistant createAssistant(String modelName) {
-
-        System.out.println(chatMemory.messages());
 
         if(assistant != null && !isTooledAssistant) {
 
@@ -393,6 +393,7 @@ public class OllamaManager {
         isTooledAssistant = false;
 
         return assistantAiServices
+                .chatMemory(chatMemory)
                 .build();
     }
 
@@ -425,6 +426,10 @@ public class OllamaManager {
 
         return OllamaManager.getInstance().createAssistant(documents, model, null);
 
+    }
+
+    public String getModelName() {
+        return model;
     }
 
     public static OllamaManager getInstance() {
