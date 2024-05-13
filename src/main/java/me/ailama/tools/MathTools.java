@@ -5,10 +5,10 @@ import me.ailama.handler.annotations.Tool;
 
 public class MathTools {
 
-    @Tool(name = "basicMathOperations", description = "Basic math operations, only does Addition (+), Subtraction (-), Multiplication (*), Division (/), Modulus (%), Power (^)", arguments = {
-            @Args(name = "a", Type = "number"),
-            @Args(name = "b", Type = "number"),
-            @Args(name = "operation_symbol", Type = "string")
+    @Tool(name = "basicMathOperations", description = "only does Addition (+), Subtraction (-), Multiplication (*), Division (/), Modulus (%), Power (^)", arguments = {
+            @Args(name = "a", Type = "number", noNull = true),
+            @Args(name = "b", Type = "number", noNull = true),
+            @Args(name = "operation_symbol", Type = "string", noNull = true)
     })
     public String basicMathOperations(Number a, Number b, String operation) {
         return switch (operation) {

@@ -100,30 +100,43 @@ public class AiCommand implements AiLamaSlashCommand {
         else
         {
             // generate normal response based on the query if the url option is not provided or the web option is not provided
-            response = OllamaManager.getInstance().
-                    getTooledAssistant(modelOption)
-                    .answer(queryOption);
+            boolean isTooledQuery = queryOption.startsWith(".");
+
+            if(isTooledQuery) {
+                response = OllamaManager.getInstance().getTooledAssistant(modelOption).answer(queryOption.replaceFirst(".", ""));
+            }
+            else
+            {
+                response = OllamaManager.getInstance().
+                        createAssistant(modelOption)
+                        .chat(queryOption);
+            }
 
             System.out.println(response);
 
-            ObjectMapper mapper = new ObjectMapper();
+            if(isTooledQuery) {
+                ObjectMapper mapper = new ObjectMapper();
 
-            String temp = Pattern.compile("(?<=\":\").*(?=\")").matcher(response).replaceAll(x -> x.group().replace("\"", "_QUOTE_") );
+                String temp = Pattern.compile("(?<=\":\").*(?=\")").matcher(response).replaceAll(x -> x.group().replace("\"", "_QUOTE_") );
 
-            try {
-                Tool tooled = mapper.readValue(temp, Tool.class);
+                try {
+                    Tool tooled = mapper.readValue(temp, Tool.class);
 
-                if(!tooled.tooled) {
-                    response = String.join("\n\n", tooled.response);
+                    if(!tooled.tooled) {
+                        response = String.join("\n\n", tooled.response);
+                    }
+                    else
+                    {
+                        response = OllamaManager.getInstance().executeTool(tooled.name, tooled.arguments.values().toArray()).toString();
+                    }
                 }
-                else
-                {
-                    response = OllamaManager.getInstance().executeTool(tooled.name, tooled.arguments.values().toArray()).toString();
+                catch (Exception e) {
+                    response = temp;
+                    Main.LOGGER.warn("Error while executing tool: {}", e.getMessage());
                 }
             }
-            catch (Exception e) {
-                response = temp;
-                Main.LOGGER.warn("Error while executing tool: " + e.getMessage());
+            else {
+                response = response.replace("_QUOTE_", "\"");
             }
 
         }

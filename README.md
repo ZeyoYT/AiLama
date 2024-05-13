@@ -22,20 +22,17 @@ Please Read : [Important Things to Consider](#important-things-to-consider-befor
 - [SearXNG Guide](#searxng-guide)
     - [Setting SearXNG](#setting-searxng--)
     - [Adding Environment Variables to AiLama](#adding-environment-variables-to-ailama--)
-- [Command Example](#command-example)
-    - [Ask a Query](#ask-a-query--)
-    - [Asking Different Model on the Fly](#asking-different-model-on-the-fly--)
-    - [Asking Query in a User only Visible Message](#asking-query-in-a-user-only-visible-message---the-command-would-be-visible-to-the-user-who-executed-it---)
-    - [Asking Query and Providing a Website URL For Context](#asking-query-and-providing-a-website-url-for-context--)
+- [List of Commands](#list-of-commands--)
 
 <br>
+
 
 ## Features
 
 - Simple To Use
 - Web Search Capabilities using SearXNG
 - Web Document for RAG Support using URL
-- Function Calling
+- Function Calling on AI Command with DOT Notation ( example below )
 - Normal Document Support
 - can be used anywhere in discord where user installable apps are supported
 - you can run you query by a different model on the fly using the model's field ( example below )
@@ -164,19 +161,18 @@ WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 2. You Need to run the Bot to use the command and keep it running
 3. Code Quality is Low because i am still new with Ai and Lang Chain
 4. This project uses a unreleased feature of JDA-5 that Supports User Installable Apps
-5. Because its a unreleased feature, i didnt find any proper command framework, so a workaround manual command registration code was used ( will be fixed in future release )
+5. Because it's a unreleased feature, i didn't find any proper command framework, so a workaround manual command registration code was used ( will be fixed in future release )
 6. The Ai does not have a memory of previous conversation (would be added in future)
-7. Its my first time making a docker image, so there might be some issues with it
+7. It's my first time making a docker image, so there might be some issues with it
 8. First Response might be slow because of the model loading
 
 <br>
 
 ## Limitations
 
-1. The Response will varay from model to model
+1. The Response will vary from model to model
 2. URL RAG might not work with smaller models that support less context window
 3. Only supports Ollama right now
-4. No Memory for previous conversations
 
 <br>
 
@@ -296,75 +292,13 @@ SEARXNG_ENGINES=<SEARXNG_ENGINES>
 
 <br>
 
-## Command Example
 
-### Ask a Query :-
-```
-/ai ask: <query here>
-```
-
-Example :-
-```
-/ai ask:Why is the Sky Blue
-```
+## List of Commands :-
+- /ai
+- /web
+- /document
+- /image
 
 <br>
 
-### Asking Different Model on the Fly :-
-```
-/ai ask: <query> model: <model_name_with_version>
-```
-
-Example :-
-```
-/ai ask:Why is the Sky Blue model:gemma:latest
-```
-
-<br>
-
-### Asking Query in a User only Visible Message <br> ( the command would be visible to the user who executed it ) :-
-```
-/ai ask: <query> ephemeral: <Options : True | False>
-```
-
-Example :-
-```
-/ai ask:Why is the Sky Blue ephemeral:True
-```
-
-<br>
-
-### Asking Query and Providing a Website URL For Context :-
-```
-/ai ask: <query> url: <url>
-```
-
-Example :-
-```
-/ai ask:Why is the Sky Blue url:https://www.space.com/why-is-the-sky-blue
-```
-
-<br>
-
-### Asking Query using Web Search ( Requires SearXNG ) :-
-```
-/ai ask: <query> web: <Options : True | False>
-```
-
-Example :-
-```
-/ai ask:What is the Time web:True
-```
-
-<br>
-
-### Asking Query using Web Search and Providing a Website URL For Context :-
-```
-/web search: <search query>
-```
-
-Example :-
-```
-/ai ask:What is the Time
-```
-
+### For More Information on Commands and Usage, Check the [Wiki](https://github.com/zeyoyt/AiLama/wiki)

@@ -1,9 +1,6 @@
 package me.ailama.handler.commandhandler;
 
-import me.ailama.commands.AiCommand;
-import me.ailama.commands.DocumentCommand;
-import me.ailama.commands.ImageCommand;
-import me.ailama.commands.WebCommand;
+import me.ailama.commands.*;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 

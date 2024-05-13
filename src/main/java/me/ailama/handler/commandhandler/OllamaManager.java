@@ -5,6 +5,8 @@ import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
@@ -12,6 +14,7 @@ import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
+import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 import me.ailama.config.Config;
 import me.ailama.handler.JsonBuilder.JsonArray;
 import me.ailama.handler.JsonBuilder.JsonObject;
@@ -41,20 +44,25 @@ public class OllamaManager {
     private final String embeddingModel;
 
     private final HashMap<String,Method> tools;
-
     private final HashMap<Class<?>, ArrayList<String>> classInstanceMap;
 
     private Assistant assistant;
+    private final ChatMemory chatMemory;
+
+    private boolean isTooledAssistant = false;
 
     public OllamaManager() {
 
         url = AiLama.getInstance().fixUrl(Config.get("OLLAMA_URL") + ":" + Config.get("OLLAMA_PORT"));
         model = Config.get("OLLAMA_MODEL");
         embeddingModel = Config.get("OLLAMA_EMBEDDING_MODEL");
+        int chatMemoryLimit = Config.get("OLLAMA_CHAT_MEMORY_UPTO") == null ? 1 : Integer.parseInt(Config.get("OLLAMA_CHAT_MEMORY_UPTO"));
 
         tools = new HashMap<>();
         classInstanceMap = new HashMap<>();
         assistant = null;
+
+        chatMemory = MessageWindowChatMemory.withMaxMessages(chatMemoryLimit);
 
         addTool(AiLama.getInstance());
         addTool(new MathTools());
@@ -159,24 +167,6 @@ public class OllamaManager {
         return toolJsonArray.objects(toolJsonObjects);
     }
 
-    @NotNull
-    private static StringBuilder getStringBuilder(Tool toolAnnotation, int i) {
-        StringBuilder description = new StringBuilder();
-        description.append(toolAnnotation.arguments()[i].description());
-
-        // if No Null
-        if(toolAnnotation.arguments()[i].noNull()) {
-            description.append(" NOT_NULL ");
-        }
-
-        // if Required
-        if(toolAnnotation.arguments()[i].required()) {
-            description.append(" REQUIRED ");
-        }
-
-        return description;
-    }
-
     // Get the Tool Method
     public Method getTool(String toolName) {
         return tools.get(toolName);
@@ -229,7 +219,7 @@ public class OllamaManager {
 
     public Assistant getTooledAssistant(String modelOption) {
 
-        if(assistant != null) {
+        if(assistant != null && isTooledAssistant) {
 
             if(modelOption != null) {
                 assistant = null;
@@ -244,114 +234,72 @@ public class OllamaManager {
 
         assistant = createAssistantX(modelOption)
                 .systemMessageProvider(x ->
-//                        String.format("""
-//                            You are a helpful AI assistant, you have a score, which can either be good or bad,
-//                            you need to maintain a good score to be helpful, if you don't maintain a good score then you will be considered unhelpful.
-//
-//                            you will try to answer the users need as best as you can and only in JSON format, else you will be given a bad score.
-//
-//                            any of the tools description listed below match the specific needs of the query then use the tool to answer the query,
-//                            the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
-//
-//                            finally if a tool is matched then give response using following schema:
-//
-//                            {
-//                                "tooled": true,
-//                                "name": "tool_name",
-//                                "arguments": {
-//                                    "argument_name": "value",
-//                                    ...
-//                                },
-//                                "reason": "detailed_reason_for_using_tool",
-//                                "match_percentage": Number
-//                            }
-//
-//                            the tool_name is the name of the tool that you are using, the arguments are the arguments that you are passing to the tool.
-//
-//                            following are the rules for tools:
-//                            if the tool description does not specify the user's needs then don't respond using a tool else you will be given a bad score.
-//                            if you don't pass the required arguments to the tool then you will be given a bad score.
-//                            if you pass a null value to a argument that specified NOT_NULL in its description then you will be given a bad score.
-//                            if you don't respect the arguments data type and description, you will be given a bad score.
-//                            if the tool has response_formatter then use it, else you will be given a bad score.
-//                            if the tool's response_formatter has a pre_formatted_response then use it, else you will be given a bad score.
-//                            don't add any other variables not defined in the response_variables, else you will be given a bad score.
-//                            don't use the tool if user asked specifically for not using tools, else you will be given a bad score.
-//                            the reason should not exceed 200 characters, and if it does, you will be given a bad score.
-//
-//                            and if you don't follow the schema, you will be given a bad score, but if you follow the schema, you will be given a good score.
-//
-//                            if you don't find a tool that match the requirements of the user then respond to the user normally,
-//                            and also make the response to be encoded for the JSON format or you will be given a bad score,
-//                            and use the following schema:
-//
-//                            {
-//                                "tooled": false,
-//                                "response": [
-//                                    "paragraph",
-//                                    "paragraph",
-//                                    ...
-//                                ]
-//                            }
-//
-//                            in the above schema, the response is an array of paragraphs that you want to respond to the user, minimum of 1 paragraph.
-//                            each new paragraph should be a new string in the array.
-//                            between each paragraph, there should be '\\n'.
-//
-//                            %s
-//                            """,tools)
-
-                        //todo improve this prompt
-
                         String.format("""
-                                
-                                You are a helpful AI Assistant, you will try to answer the user's needs as best as you can and only in JSON format.
-                                you have access to a set of tools that may help you give accurate responses to the user.
-                                if you find a tool that matches the user's query then use the tool to answer the query.
-                                
-                                If a tool is matched then give response using the following schema:
-                                
-                                {
-                                    "tooled": true,
-                                    "name": "tool_name",
-                                    "arguments": {
-                                        "argument_name": "value",
-                                        ...
-                                    },
-                                    "reason": "detailed_reason_for_using_tool",
-                                    "match_percentage": Number
-                                }
-                                
-                                the tool_name is the name of the tool that you are using, the arguments are the arguments that you are passing to the tool.
-                                the tool's description is as specific as possible, so don't assume that the tool can be used for anything else.
-                                
-                                if you don't find a tool that matches the requirements of the user then respond to the user using the following schema:
-                                
-                                {
-                                    "tooled": false,
-                                    "response": [
-                                        "paragraph",
-                                        "paragraph",
-                                        ...
-                                    ]
-                                }
-                                
-                                each paragraph must be 200 characters or less
-                                
-                                in the above schema, the response is an array of paragraphs that you want to respond to the user, minimum of 1 paragraph.
-                                each new paragraph should be a new string in the array.
-                                
-                                %s
-                                """, tools)
+                            You are a helpful AI assistant, you have a score, which can either be good or bad,
+                            you need to maintain a good score to be helpful, if you don't maintain a good score then you will be considered unhelpful.
+
+                            you will try to answer the users need as best as you can and only in JSON format, else you will be given a bad score.
+
+                            any of the tools description listed below match the specific needs of the query then use the tool to answer the query,
+                            the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
+
+                            finally if a tool is matched then give response using following schema:
+
+                            {
+                                "tooled": true,
+                                "name": "tool_name",
+                                "arguments": {
+                                    "argument_name": "value",
+                                    ...
+                                },
+                                "reason": "detailed_reason_for_using_tool",
+                                "match_percentage": Number
+                            }
+
+                            the tool_name is the name of the tool that you are using, the arguments are the arguments that you are passing to the tool.
+
+                            following are the rules for tools:
+                            if the tool description does not specify the user's needs then don't respond using a tool else you will be given a bad score.
+                            if you don't pass the required arguments to the tool then you will be given a bad score.
+                            if you pass a null value to a argument that specified NOT_NULL in its description then you will be given a bad score.
+                            if you don't respect the arguments data type and description, you will be given a bad score.
+                            if the tool has response_formatter then use it, else you will be given a bad score.
+                            if the tool's response_formatter has a pre_formatted_response then use it, else you will be given a bad score.
+                            don't add any other variables not defined in the response_variables, else you will be given a bad score.
+                            don't use the tool if user asked specifically for not using tools, else you will be given a bad score.
+                            the reason should not exceed 200 characters, and if it does, you will be given a bad score.
+
+                            and if you don't follow the schema, you will be given a bad score, but if you follow the schema, you will be given a good score.
+
+                            if you don't find a tool that match the requirements of the user then respond to the user normally,
+                            and also make the response to be encoded for the JSON format or you will be given a bad score,
+                            and use the following schema:
+
+                            {
+                                "tooled": false,
+                                "response": [
+                                    "paragraph",
+                                    "paragraph",
+                                    ...
+                                ],
+                                "rule": "which_rule_used_to_not_use_tool"
+                            }
+
+                            in the above schema, the response is an array of paragraphs that you want to respond to the user, minimum of 1 paragraph.
+                            each new paragraph should be a new string in the array.
+                            between each paragraph, there should be '\\n'.
+
+                            %s
+                            """,tools)
                 )
                 .build();
 
         System.out.println(tools);
 
+        isTooledAssistant = true;
+
         return assistant;
     }
-
-    // write a hello world function
 
     // Returns a custom Assistant that uses the provided model, allowing for more customization
     public AiServices<Assistant> createAssistantX(String modelName) {
@@ -365,16 +313,26 @@ public class OllamaManager {
                 .format("json")
                 .build();
 
+        isTooledAssistant = false;
+
         return AiServices.builder(Assistant.class)
                 .chatLanguageModel(ollama);
     }
 
-    // Hello World
-
-
-
     // Just a Simple Response
     public Assistant createAssistant(String modelName) {
+
+        System.out.println(chatMemory.messages());
+
+        if(assistant != null && !isTooledAssistant) {
+
+            if(modelName != null && !modelName.equals(model)) {
+                assistant = null;
+                return createAssistant(modelName);
+            }
+
+            return assistant;
+        }
 
         String aiModel = modelName != null ? modelName : model;
 
@@ -384,9 +342,14 @@ public class OllamaManager {
                 .temperature(TEMPERATURE)
                 .build();
 
-        return AiServices.builder(Assistant.class)
+        assistant = AiServices.builder(Assistant.class)
                 .chatLanguageModel(ollama)
+                .chatMemory(chatMemory)
                 .build();
+
+        isTooledAssistant = false;
+
+        return assistant;
     }
 
     // Response Based on Provided Document
@@ -426,6 +389,8 @@ public class OllamaManager {
         if(systemMessage != null) {
             assistantAiServices.systemMessageProvider(o -> systemMessage);
         }
+
+        isTooledAssistant = false;
 
         return assistantAiServices
                 .build();
