@@ -55,11 +55,13 @@ public class DocumentCommand implements AiLamaSlashCommand {
         String instructionOption = event.getOption("instructions") != null ? event.getOption("instructions").getAsString() : null;
         boolean resetSession = event.getOption("reset-session") != null && event.getOption("reset-session").getAsBoolean();
 
+        String userId = event.getUser().getId();
+
         // Get the document
         Message.Attachment document = event.getOption("document").getAsAttachment();
 
         if(resetSession) {
-            OllamaManager.getInstance().getChatMemory().clear();
+            OllamaManager.getInstance().getChatMemory(userId).clear();
         }
 
         // check if document provided is a text based document like .txt .docx .pdf etc
@@ -77,8 +79,8 @@ public class DocumentCommand implements AiLamaSlashCommand {
             String systemMessage = "First give details about the document like keywords, number of characters, etc. then summarize it and also show the actual content without modification";
 
             // get the response from the document
-            response = OllamaManager.getInstance().createAssistant(List.of(docFromBytes), modelOption, systemMessage)
-                    .answer(instructionOption == null ? "Summarize it and also show the actual content without modification" : instructionOption);
+            response = OllamaManager.getInstance().createAssistant(List.of(docFromBytes), modelOption, systemMessage, userId)
+                    .chat(userId,instructionOption == null ? "Summarize it and also show the actual content without modification" : instructionOption);
         }
         catch (Exception e) {
             response = "Error while reading the document: " + e.getMessage();

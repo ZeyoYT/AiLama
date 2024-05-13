@@ -58,8 +58,11 @@ public class AiCommand implements AiLamaSlashCommand {
         String response = "";
         String urlForContent = null;
 
+
+        String userId = event.getUser().getId();
+
         if(resetSession) {
-            OllamaManager.getInstance().getChatMemory().clear();
+            OllamaManager.getInstance().getChatMemory(userId).clear();
         }
 
         // Check if the web option and url option are provided at the same time
@@ -90,10 +93,10 @@ public class AiCommand implements AiLamaSlashCommand {
 
         if(urlOption != null || urlForContent != null) {
             // if the url option is provided or the web option is provided, ask the assistant to answer the query based on the url
-            Assistant assistant = OllamaManager.getInstance().urlAssistant( List.of(urlForContent != null ? urlForContent : urlOption) , modelOption);
+            Assistant assistant = OllamaManager.getInstance().urlAssistant( List.of(urlForContent != null ? urlForContent : urlOption) , modelOption, userId);
 
             if(assistant != null) {
-                response = assistant.answer(queryOption);
+                response = assistant.chat(userId,queryOption);
 
                 // add the source of the content to the response
                 if(response != null) {
@@ -107,13 +110,13 @@ public class AiCommand implements AiLamaSlashCommand {
             boolean isTooledQuery = queryOption.startsWith(".");
 
             if(isTooledQuery) {
-                response = OllamaManager.getInstance().getTooledAssistant(modelOption).answer(queryOption.replaceFirst(".", ""));
+                response = OllamaManager.getInstance().getTooledAssistant(modelOption, userId).answer(queryOption.replaceFirst(".", ""));
             }
             else
             {
                 response = OllamaManager.getInstance().
-                        createAssistant(modelOption)
-                        .chat(queryOption);
+                        createAssistant(modelOption, userId)
+                        .chat(userId,queryOption);
             }
 
             if(isTooledQuery) {

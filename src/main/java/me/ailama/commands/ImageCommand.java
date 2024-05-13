@@ -67,7 +67,7 @@ public class ImageCommand implements AiLamaSlashCommand {
                             """)
                     .build();
 
-            queryOption = JsonParser.parseString(assistant.answer(queryOption)).getAsJsonObject().get("prompt").getAsString();
+            queryOption = JsonParser.parseString(assistant.chat(event.getUser().getId(),queryOption)).getAsJsonObject().get("prompt").getAsString();
         }
 
         byte[] bytes = Automatic1111Manager.getInstance().generateImage(queryOption);

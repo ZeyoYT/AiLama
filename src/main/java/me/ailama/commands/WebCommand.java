@@ -51,8 +51,10 @@ public class WebCommand implements AiLamaSlashCommand {
 
         int limitOption = event.getOption("limit") != null ? event.getOption("limit").getAsInt() : 1;
 
+        String userId = event.getUser().getId();
+
         if(resetSession) {
-            OllamaManager.getInstance().getChatMemory().clear();
+            OllamaManager.getInstance().getChatMemory(userId).clear();
         }
 
         if(limitOption < 1) {
@@ -75,7 +77,7 @@ public class WebCommand implements AiLamaSlashCommand {
         }
 
         // Create a URL Assistant
-        Assistant assistant = OllamaManager.getInstance().urlAssistant(urlForContent, modelOption);
+        Assistant assistant = OllamaManager.getInstance().urlAssistant(urlForContent, modelOption, userId);
 
         // if there was an error while creating the assistant
         if(assistant == null) {
@@ -84,7 +86,7 @@ public class WebCommand implements AiLamaSlashCommand {
         }
 
         // Get the response
-        String response = assistant.answer(instructionOption != null ? instructionOption : queryOption);
+        String response = assistant.chat(userId,instructionOption != null ? instructionOption : queryOption);
         response += "\n";
 
         // Add the source of the content

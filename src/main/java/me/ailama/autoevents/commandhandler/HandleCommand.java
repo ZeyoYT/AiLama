@@ -26,6 +26,8 @@ public class HandleCommand extends ListenerAdapter {
             }, err -> {
                 event.reply("You are not allowed to use this command. its only made for the developer or a select few whitelisted people").setEphemeral(true).queue();
             });
+
+            return;
         }
 
         if(CommandRegister.getInstance().getCommandMap().containsKey(event.getInteraction().getName())) {

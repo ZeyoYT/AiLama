@@ -31,6 +31,7 @@ import org.jsoup.Jsoup;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -46,23 +47,25 @@ public class OllamaManager {
     private final HashMap<String,Method> tools;
     private final HashMap<Class<?>, ArrayList<String>> classInstanceMap;
 
-    private Assistant assistant;
-    private final ChatMemory chatMemory;
+    private HashMap<String,Assistant> assistants;
+    private HashMap<String, ChatMemory> chatMemories;
+    private int chatMemoryLimit;
 
     private boolean isTooledAssistant = false;
+
+    // TODO Implement Separate Memory for each User
+    // https://github.com/langchain4j/langchain4j-examples/blob/main/other-examples/src/main/java/ServiceWithMemoryForEachUserExample.java
 
     public OllamaManager() {
 
         url = AiLama.getInstance().fixUrl(Config.get("OLLAMA_URL") + ":" + Config.get("OLLAMA_PORT"));
         model = Config.get("OLLAMA_MODEL");
         embeddingModel = Config.get("OLLAMA_EMBEDDING_MODEL");
-        int chatMemoryLimit = Config.get("OLLAMA_CHAT_MEMORY_UPTO") == null ? 1 : Integer.parseInt(Config.get("OLLAMA_CHAT_MEMORY_UPTO"));
+        chatMemoryLimit = Config.get("OLLAMA_CHAT_MEMORY_UPTO") == null ? 1 : Integer.parseInt(Config.get("OLLAMA_CHAT_MEMORY_UPTO"));
 
         tools = new HashMap<>();
         classInstanceMap = new HashMap<>();
-        assistant = null;
-
-        chatMemory = MessageWindowChatMemory.withMaxMessages(chatMemoryLimit);
+        assistants = new HashMap<>();
 
         addTool(AiLama.getInstance());
         addTool(new MathTools());
@@ -217,22 +220,32 @@ public class OllamaManager {
         return methods;
     }
 
-    public Assistant getTooledAssistant(String modelOption) {
+    public Assistant getAssistantFromID(String id) {
 
-        if(assistant != null && isTooledAssistant) {
+        if(assistants.containsKey(id)) {
+            return assistants.get(id);
+        }
+
+        return null;
+    }
+
+    public Assistant getTooledAssistant(String modelOption, String userID) {
+
+        Assistant assistantFromID = getAssistantFromID(userID);
+
+        if(assistantFromID != null && isTooledAssistant) {
 
             if(modelOption != null) {
-                assistant = null;
-                return getTooledAssistant(modelOption);
+                return getTooledAssistant(modelOption, userID);
             }
 
-            return assistant;
+            return assistantFromID;
 
         }
 
         String tools = String.format("tools = %s",OllamaManager.getInstance().getFinalJson().build());
 
-        assistant = createAssistantX(modelOption)
+        assistantFromID = createAssistantX(modelOption)
                 .systemMessageProvider(x ->
                         String.format("""
                             You are a helpful AI assistant, you have a score, which can either be good or bad,
@@ -296,11 +309,23 @@ public class OllamaManager {
 
         isTooledAssistant = true;
 
-        return assistant;
+        // Update or Add the Assistant to the HashMap
+        assistants.put(userID, assistantFromID);
+
+        return assistantFromID;
     }
 
-    public ChatMemory getChatMemory() {
-        return chatMemory;
+    public ChatMemory getChatMemory(String userId) {
+
+        if(chatMemories == null) {
+            chatMemories = new HashMap<>();
+        }
+
+        if(!chatMemories.containsKey(userId)) {
+            chatMemories.put(userId, MessageWindowChatMemory.withMaxMessages(chatMemoryLimit));
+        }
+
+        return chatMemories.get(userId);
     }
 
     // Returns a custom Assistant that uses the provided model, allowing for more customization
@@ -322,13 +347,13 @@ public class OllamaManager {
     }
 
     // Just a Simple Response
-    public Assistant createAssistant(String modelName) {
+    public Assistant createAssistant(String modelName, String userID) {
 
+        Assistant assistant = getAssistantFromID(userID);
         if(assistant != null && !isTooledAssistant) {
 
             if(modelName != null && !modelName.equals(model)) {
-                assistant = null;
-                return createAssistant(modelName);
+                return createAssistant(modelName, userID);
             }
 
             return assistant;
@@ -344,16 +369,19 @@ public class OllamaManager {
 
         assistant = AiServices.builder(Assistant.class)
                 .chatLanguageModel(ollama)
-                .chatMemory(chatMemory)
+                .chatMemoryProvider(memId -> getChatMemory(userID))
                 .build();
 
         isTooledAssistant = false;
+
+        // Update or Add the Assistant to the HashMap
+        assistants.put(userID, assistant);
 
         return assistant;
     }
 
     // Response Based on Provided Document
-    public Assistant createAssistant(List<Document> documents, String modelName, String systemMessage) {
+    public Assistant createAssistant(List<Document> documents, String modelName, String systemMessage, String userId) {
 
         String aiModel = modelName != null ? modelName : model;
 
@@ -393,12 +421,12 @@ public class OllamaManager {
         isTooledAssistant = false;
 
         return assistantAiServices
-                .chatMemory(chatMemory)
+                .chatMemoryProvider(memId -> getChatMemory(userId))
                 .build();
     }
 
     // Response Based on Provided URL
-    public Assistant urlAssistant(List<String> url, String model) {
+    public Assistant urlAssistant(List<String> url, String model, String userId) {
 
         List<Document> documents = new ArrayList<>();
 
@@ -424,12 +452,8 @@ public class OllamaManager {
             return null;
         }
 
-        return OllamaManager.getInstance().createAssistant(documents, model, null);
+        return OllamaManager.getInstance().createAssistant(documents, model, null, userId);
 
-    }
-
-    public String getModelName() {
-        return model;
     }
 
     public static OllamaManager getInstance() {
