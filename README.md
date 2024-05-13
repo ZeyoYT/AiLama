@@ -202,6 +202,7 @@ services:
       - DEV_ID=<YOUR_DISCORD_ID>
       # Optional Parameters :-
       # Write inside single quotes and the user ids separated by commas, if you dont want to use this feature, just write '' (empty string enclosed by single quotes)
+      - OLLAMA_CHAT_MEMORY_UPTO=<NUMBER_OF_MESSAGES_TO_REMEMBER>
       - WHITELISTED_USERS='<user_id1>,<user_id2>,<user_id3> ... <user_idN>'
       - SEARXNG_URL=<YOUR_SEARXNG_URL>
       - SEARXNG_PORT=<YOUR_SEARXNG_PORT>

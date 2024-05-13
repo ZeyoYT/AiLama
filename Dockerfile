@@ -14,6 +14,7 @@ WORKDIR /app
 # If the Docker environment variable is not provided, use the default value from .env.example
 ARG TOKEN
 ENV TOKEN=${TOKEN:-your_actual_bot_token}
+
 ARG OLLAMA_URL
 ENV OLLAMA_URL=${OLLAMA_URL:-https://your_ollama_api_url}
 ARG OLLAMA_PORT
@@ -22,6 +23,9 @@ ARG OLLAMA_MODEL
 ENV OLLAMA_MODEL=${OLLAMA_MODEL:-my_model_name}
 ARG OLLAMA_EMBEDDING_MODEL
 ENV OLLAMA_EMBEDDING_MODEL=${OLLAMA_EMBEDDING_MODEL:-embedding_model}
+ARG OLLAMA_CHAT_MEMORY_UPTO
+ENV OLLAMA_CHAT_MEMORY_UPTO=${OLLAMA_CHAT_MEMORY_UPTO:1}
+
 ARG DEV_ID
 ENV DEV_ID=${DEV_ID:-your_discord_user_id}
 ARG WHITELISTED_USERS
@@ -41,6 +45,7 @@ RUN echo "TOKEN=$TOKEN" > .env \
     && echo "OLLAMA_PORT=$OLLAMA_PORT" >> .env \
     && echo "OLLAMA_MODEL=$OLLAMA_MODEL" >> .env \
     && echo "OLLAMA_EMBEDDING_MODEL=$OLLAMA_EMBEDDING_MODEL" >> .env \
+    && echo "OLLAMA_CHAT_MEMORY_UPTO=$OLLAMA_CHAT_MEMORY_UPTO" >> .env \
     && echo "DEV_ID=$DEV_ID" >> .env
 
 # Add WHITELISTED_USERS to .env if provided
