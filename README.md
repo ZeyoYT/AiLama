@@ -162,7 +162,7 @@ WHITELISTED_USERS='426802118683262976, 259214353931304963, 848561799132741652'
 3. Code Quality is Low because i am still new with Ai and Lang Chain
 4. This project uses a unreleased feature of JDA-5 that Supports User Installable Apps
 5. Because it's a unreleased feature, i didn't find any proper command framework, so a workaround manual command registration code was used ( will be fixed in future release )
-6. The Ai does not have a memory of previous conversation (would be added in future)
+6. The Ai does not have persistent memory, so it will forget the conversation after restart 
 7. It's my first time making a docker image, so there might be some issues with it
 8. First Response might be slow because of the model loading
 

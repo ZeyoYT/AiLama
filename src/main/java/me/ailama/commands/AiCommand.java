@@ -55,6 +55,8 @@ public class AiCommand implements AiLamaSlashCommand {
         String urlOption = event.getOption("url") != null ? event.getOption("url").getAsString() : null;
         boolean resetSession = event.getOption("reset-session") != null && event.getOption("reset-session").getAsBoolean();
 
+        System.out.println(urlOption);
+
         String response = "";
         String urlForContent = null;
 
