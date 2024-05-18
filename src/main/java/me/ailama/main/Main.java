@@ -58,7 +58,44 @@ public class Main {
         }
     }
 
+    public boolean checkRequiredEnvironmentArgs() {
+
+        boolean flag = true;
+
+        if(System.getenv("TOKEN") == null) {
+            LOGGER.error("TOKEN environment variable is missing");
+            flag = false;
+        }
+
+        if(System.getenv("OLLAMA_URL") == null) {
+            LOGGER.error("OLLAMA_URL environment variable is missing");
+            flag = false;
+        }
+
+        if(System.getenv("OLLAMA_MODEL") == null) {
+            LOGGER.error("OLLAMA_MODEL environment variable is missing");
+            flag = false;
+        }
+
+        if(System.getenv("OLLAMA_EMBEDDING_MODEL") == null) {
+            LOGGER.error("OLLAMA_EMBEDDING_MODEL environment variable is missing");
+            flag = false;
+        }
+
+        if(System.getenv("DEV_ID") == null) {
+            LOGGER.error("DEV_ID environment variable is missing");
+            flag = false;
+        }
+
+        return flag;
+    }
+
     public static void main(String[] args) {
+
+        if(!getInstance().checkRequiredEnvironmentArgs()) {
+            System.exit(0);
+        }
+
         getInstance();
     }
 

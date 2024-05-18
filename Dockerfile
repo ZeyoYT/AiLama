@@ -31,15 +31,6 @@ ENV DEV_ID=${DEV_ID}
 ARG WHITELISTED_USERS
 ENV WHITELISTED_USERS=${WHITELISTED_USERS}
 
-# Check if any required environment variables are missing
-RUN test -n "$TOKEN" && \
-    test -n "$OLLAMA_URL" && \
-    test -n "$OLLAMA_PORT" && \
-    test -n "$OLLAMA_MODEL" && \
-    test -n "$OLLAMA_EMBEDDING_MODEL" && \
-    test -n "$DEV_ID" || \
-    { echo "One or more required environment variables are missing."; exit 1; }
-
 RUN echo "TOKEN=$TOKEN" > .env \
     && echo "OLLAMA_URL=$OLLAMA_URL" >> .env \
     && echo "OLLAMA_PORT=$OLLAMA_PORT" >> .env \
