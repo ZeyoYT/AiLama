@@ -25,6 +25,10 @@ public class SearXNGManager {
     // urls that either are blocked or fails to load as documents
     private final ArrayList<String> forbiddenUrls;
 
+    private final String imageEngines = "google images,brave.images,bing images";
+
+    private String engine;
+
     public SearXNGManager() {
 
         forbiddenUrls = new ArrayList<>();
@@ -39,9 +43,9 @@ public class SearXNGManager {
         }
 
         url = AiLama.getInstance().fixUrl(Config.get("SEARXNG_URL") + ":" + Config.get("SEARXNG_PORT"));
-        String engine = fixEngineString(Config.get("SEARXNG_ENGINES"));
+        engine = fixEngineString(Config.get("SEARXNG_ENGINES"));
 
-        finalUrl = url + "/?q=%s&format=json&engines=" + engine;
+        finalUrl = url + "/?q=%s&format=json&engines=";
 
     }
 
@@ -102,7 +106,7 @@ public class SearXNGManager {
 
             try {
 
-                String searXUrl = String.format(finalUrl, URLEncoder.encode(query, StandardCharsets.UTF_8));
+                String searXUrl = String.format(finalUrl + engine, URLEncoder.encode(query, StandardCharsets.UTF_8));
 
                 OkHttpClient client = new OkHttpClient();
                 okhttp3.Request request = new okhttp3.Request.Builder()
@@ -142,13 +146,18 @@ public class SearXNGManager {
         - max amount is 10
         - min amount is 1
     */
-    public List<String> getTopSearchResults(String query, int amount) {
+    public List<String> getTopSearchResults(String query, int amount, boolean imageOnly) {
         if(url != null) {
 
             try {
 
                 int amountToGet = Math.min(amount, 10);
-                String searXUrl = String.format(finalUrl, URLEncoder.encode(query, StandardCharsets.UTF_8));
+
+                String finalEngine = imageOnly ? imageEngines : engine;
+
+                String urlBuilder = finalUrl + finalEngine;
+
+                String searXUrl = String.format(urlBuilder, URLEncoder.encode(query, StandardCharsets.UTF_8));
 
                 OkHttpClient client = new OkHttpClient();
                 okhttp3.Request request = new okhttp3.Request.Builder()
@@ -174,7 +183,12 @@ public class SearXNGManager {
                 amountToGet = Math.min(amountToGet, filteredList.size());
 
                 return filteredList.subList(0, amountToGet).stream()
-                        .map(result -> result.url)
+                        .map(result -> {
+                            if(imageOnly) {
+                                return result.img_src;
+                            }
+                            return result.url;
+                        })
                         .toList();
 
             }

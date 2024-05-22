@@ -12,7 +12,11 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.internal.utils.IOUtil;
 
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WebCommand implements AiLamaSlashCommand {
@@ -24,6 +28,7 @@ public class WebCommand implements AiLamaSlashCommand {
                 .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
 
                 .addOption(OptionType.STRING, "search", "The query you want to search for", true)
+                .addOption(OptionType.BOOLEAN, "for-image", "search for a image", false)
                 .addOption(OptionType.STRING, "instructions", "additional instructions after getting search result", false)
                 .addOption(OptionType.INTEGER, "limit", "The limit of search results", false)
                 .addOption(OptionType.BOOLEAN, "ephemeral", "If you want the response to be ephemeral", false)
@@ -48,6 +53,7 @@ public class WebCommand implements AiLamaSlashCommand {
         String instructionOption = event.getOption("instructions") != null ? event.getOption("instructions").getAsString() : null;
         String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
         boolean resetSession = event.getOption("reset-session") != null && event.getOption("reset-session").getAsBoolean();
+        boolean imageOnly = event.getOption("for-image") != null && event.getOption("for-image").getAsBoolean();
 
         int limitOption = event.getOption("limit") != null ? event.getOption("limit").getAsInt() : 1;
 
@@ -68,11 +74,28 @@ public class WebCommand implements AiLamaSlashCommand {
         }
 
         // Get the URL for the content
-        List<String> urlForContent = SearXNGManager.getInstance().getTopSearchResults(queryOption, limitOption);
+        List<String> urlForContent = SearXNGManager.getInstance().getTopSearchResults(queryOption, limitOption, imageOnly);
 
         // If no proper results were found from the search
         if(urlForContent == null) {
             event.getHook().sendMessage("No proper results were found").setEphemeral(true).queue();
+            return;
+        }
+
+        if(imageOnly) {
+            List<FileUpload> fileUploads = new ArrayList<>();
+
+            for(String url : urlForContent) {
+                try {
+                    byte[] bytes = IOUtil.readFully(new URL(url).openStream());
+                    fileUploads.add(FileUpload.fromData(bytes, "image.png"));
+                } catch (Exception e) {
+                    event.getHook().sendMessage("Error while sending image").setEphemeral(true).queue();
+                    return;
+                }
+            }
+
+            event.getHook().sendFiles(fileUploads).queue();
             return;
         }
 

@@ -62,27 +62,27 @@ public class Main {
 
         boolean flag = true;
 
-        if(System.getenv("TOKEN") == null) {
+        if(Config.get("TOKEN") == null) {
             LOGGER.error("TOKEN environment variable is missing");
             flag = false;
         }
 
-        if(System.getenv("OLLAMA_URL") == null) {
+        if(Config.get("OLLAMA_URL") == null) {
             LOGGER.error("OLLAMA_URL environment variable is missing");
             flag = false;
         }
 
-        if(System.getenv("OLLAMA_MODEL") == null) {
+        if(Config.get("OLLAMA_MODEL") == null) {
             LOGGER.error("OLLAMA_MODEL environment variable is missing");
             flag = false;
         }
 
-        if(System.getenv("OLLAMA_EMBEDDING_MODEL") == null) {
+        if(Config.get("OLLAMA_EMBEDDING_MODEL") == null) {
             LOGGER.error("OLLAMA_EMBEDDING_MODEL environment variable is missing");
             flag = false;
         }
 
-        if(System.getenv("DEV_ID") == null) {
+        if(Config.get("DEV_ID") == null) {
             LOGGER.error("DEV_ID environment variable is missing");
             flag = false;
         }
