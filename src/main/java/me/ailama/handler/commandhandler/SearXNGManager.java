@@ -202,8 +202,13 @@ public class SearXNGManager {
     }
 
     public void addForbiddenUrl(String url, String reason) {
-        forbiddenUrls.add(url);
-        Main.LOGGER.info("Added " + url + " to the forbidden list" + (reason != null ? " because " + reason : ""));
+        if(!forbiddenUrls.contains(url)) {
+            forbiddenUrls.add(url);
+            Main.LOGGER.warn("Added {} to the forbidden list: {}", url, reason);
+        }
+        else {
+            Main.LOGGER.warn("{} was found in the forbidden list", url);
+        }
     }
 
     public boolean isSearXNGEnabled() {

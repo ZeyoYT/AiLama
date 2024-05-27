@@ -2,6 +2,7 @@ package me.ailama.tools;
 
 import me.ailama.handler.annotations.Args;
 import me.ailama.handler.annotations.Tool;
+import me.ailama.handler.commandhandler.OllamaManager;
 
 import java.net.URI;
 
@@ -17,5 +18,10 @@ public class UtilityTools {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Tool(name = "toolsJson", description = "Get all the tools available to use")
+    public String toolsJson() {
+        return OllamaManager.getInstance().getFinalJson().build();
     }
 }

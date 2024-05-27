@@ -91,15 +91,18 @@ public class AiCommand implements AiLamaSlashCommand {
 
         }
 
+        boolean isTooledQuery = queryOption.startsWith(".");
+
         if(urlOption != null || urlForContent != null) {
+
             // if the url option is provided or the web option is provided, ask the assistant to answer the query based on the url
-            Assistant assistant = OllamaManager.getInstance().urlAssistant( List.of(urlForContent != null ? urlForContent : urlOption) , modelOption, userId);
+            Assistant assistant = OllamaManager.getInstance().urlAssistant( List.of(urlForContent != null ? urlForContent : urlOption) , modelOption, userId, isTooledQuery);
 
             if(assistant != null) {
                 response = assistant.chat(userId,queryOption);
 
                 // add the source of the content to the response
-                if(response != null) {
+                if(response != null && !isTooledQuery) {
                     response += "\n\nSource: <" + (urlForContent != null ? urlForContent : urlOption) + ">";
                 }
             }
@@ -107,10 +110,8 @@ public class AiCommand implements AiLamaSlashCommand {
         else
         {
             // generate normal response based on the query if the url option is not provided or the web option is not provided
-            boolean isTooledQuery = queryOption.startsWith(".");
-
             if(isTooledQuery) {
-                response = OllamaManager.getInstance().getTooledAssistant(modelOption, userId).answer(queryOption.replaceFirst(".", ""));
+                response = OllamaManager.getInstance().getTooledAssistant(modelOption, userId, null).answer(queryOption.replaceFirst(".", ""));
             }
             else
             {
@@ -119,31 +120,39 @@ public class AiCommand implements AiLamaSlashCommand {
                         .chat(userId,queryOption);
             }
 
-            if(isTooledQuery) {
-                ObjectMapper mapper = new ObjectMapper();
 
-                String temp = Pattern.compile("(?<=\":\").*(?=\")").matcher(response).replaceAll(x -> x.group().replace("\"", "_QUOTE_") );
+            if(!isTooledQuery) {
+                response = response.replace("_QUOTE_", "\"");
+            }
 
-                try {
-                    Tool tooled = mapper.readValue(temp, Tool.class);
+        }
 
-                    if(!tooled.tooled) {
-                        response = String.join("\n\n", tooled.response);
+        if(isTooledQuery) {
+            ObjectMapper mapper = new ObjectMapper();
+
+            String temp = Pattern.compile("(?<=\":\").*(?=\")").matcher(response).replaceAll(x -> x.group().replace("\"", "_QUOTE_") );
+
+            try {
+                Tool tooled = mapper.readValue(temp, Tool.class);
+
+                if(!tooled.tooled) {
+                    response = String.join("\n\n", tooled.response);
+                }
+                else
+                {
+                    if(OllamaManager.getInstance().isToolRawResponse(tooled.name)) {
+                        response = OllamaManager.getInstance().executeTool(tooled.name, response).toString();
                     }
                     else
                     {
                         response = OllamaManager.getInstance().executeTool(tooled.name, tooled.arguments.values().toArray()).toString();
                     }
                 }
-                catch (Exception e) {
-                    response = temp;
-                    Main.LOGGER.warn("Error while executing tool: {}", e.getMessage());
-                }
             }
-            else {
-                response = response.replace("_QUOTE_", "\"");
+            catch (Exception e) {
+                response = temp;
+                Main.LOGGER.warn("Error while executing tool: {}", e.getMessage());
             }
-
         }
 
 

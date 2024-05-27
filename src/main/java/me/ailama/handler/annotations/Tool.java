@@ -8,7 +8,9 @@ public @interface Tool {
     String name();
     String description();
 
-    Args[] arguments();
+    Args[] arguments() default {};
+
+    boolean rawResponse() default false;
 
     ResponseFormatter responseFormatter() default @ResponseFormatter(responseOrder = {}, responseVariables = {}, preFormattedResponse = "", isPreFormatted = false, isResponseOrder = false);
 }

@@ -100,7 +100,7 @@ public class WebCommand implements AiLamaSlashCommand {
         }
 
         // Create a URL Assistant
-        Assistant assistant = OllamaManager.getInstance().urlAssistant(urlForContent, modelOption, userId);
+        Assistant assistant = OllamaManager.getInstance().urlAssistant(urlForContent, modelOption, userId, false);
 
         // if there was an error while creating the assistant
         if(assistant == null) {

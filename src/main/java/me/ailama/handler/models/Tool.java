@@ -8,10 +8,10 @@ import java.util.HashMap;
 public class Tool {
 
     public boolean tooled;
+    public boolean rawResponse;
     public String name;
 
     public HashMap<String, Object> arguments;
-
 
     public String[] response;
 }
