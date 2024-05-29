@@ -145,7 +145,7 @@ public class AiCommand implements AiLamaSlashCommand {
                     }
                     else
                     {
-                        response = OllamaManager.getInstance().executeTool(tooled.name, tooled.arguments.values().toArray()).toString();
+                        response = OllamaManager.getInstance().executeTool(tooled.name, tooled.parameters.values().toArray()).toString();
                     }
                 }
             }

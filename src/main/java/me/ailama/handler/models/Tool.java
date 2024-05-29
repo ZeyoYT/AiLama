@@ -11,7 +11,7 @@ public class Tool {
     public boolean rawResponse;
     public String name;
 
-    public HashMap<String, Object> arguments;
+    public HashMap<String, Object> parameters;
 
     public String[] response;
 }

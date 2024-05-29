@@ -2,6 +2,7 @@ package me.ailama.autoevents.commandhandler;
 
 import me.ailama.config.Config;
 import me.ailama.handler.commandhandler.CommandRegister;
+import me.ailama.main.AiLama;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 

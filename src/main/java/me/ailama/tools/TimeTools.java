@@ -1,14 +1,14 @@
 package me.ailama.tools;
 
-import me.ailama.handler.annotations.Args;
+import me.ailama.handler.annotations.Parameter;
 import me.ailama.handler.annotations.Tool;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 public class TimeTools {
 
-        @Tool(name = "formatTime", description = "Format time from milliseconds to a readable format like formatTime(N1)", arguments = {
-                @Args(name = "timeInMillis", Type = "number")
+        @Tool(name = "formatTime", description = "Format time from milliseconds to a readable format like formatTime(N1)", parameters = {
+                @Parameter(name = "timeInMillis", Type = "number")
         })
         public String formatTime(final long timeInMillis) {
 
@@ -23,9 +23,9 @@ public class TimeTools {
             return String.format("%02d:%02d:%02d", hours, minutes, seconds);
         }
 
-        @Tool(name = "time", description = "Get the current time", arguments = {
-                @Args(name = "is24Hour", Type = "boolean", description = "true for 24-hour format, false for 12-hour format"),
-                @Args(name = "timeZone", Type = "string", description = "Timezone in which you want to get the time like 'Asia/Kolkata'")
+        @Tool(name = "time", description = "Get the current time", parameters = {
+                @Parameter(name = "is24Hour", Type = "boolean", description = "true for 24-hour format, false for 12-hour format"),
+                @Parameter(name = "timeZone", Type = "string", description = "Timezone in which you want to get the time like 'Asia/Kolkata'")
         })
         public String time(boolean is24Hour, String timeZone) {
             DateTime dateTime = new DateTime();

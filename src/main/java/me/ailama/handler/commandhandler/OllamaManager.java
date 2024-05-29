@@ -21,14 +21,12 @@ import me.ailama.handler.annotations.Tool;
 import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
 import me.ailama.main.Main;
-import me.ailama.tools.ApiTools;
-import me.ailama.tools.MathTools;
-import me.ailama.tools.TimeTools;
-import me.ailama.tools.UtilityTools;
+import me.ailama.tools.*;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,43 +116,34 @@ public class OllamaManager {
                     .add("description",toolAnnotation.description());
 
             // Add Arguments if there are any
-            if(toolAnnotation.arguments().length > 0) {
-                JsonArray arguments = new JsonArray();
-                ArrayList<JsonObject> argumentJsonObjects = new ArrayList<>();
+            if(toolAnnotation.parameters().length > 0) {
+                JsonArray parameters = new JsonArray();
+                ArrayList<JsonObject> parametersJsonObjects = new ArrayList<>();
+
+                JsonArray requiredParameters = new JsonArray();
 
                 // Add the arguments to the JSON
-                for (int i = 0; i < toolAnnotation.arguments().length; i++) {
+                for (int i = 0; i < toolAnnotation.parameters().length; i++) {
 
-                    JsonObject argument = new JsonObject();
+                    JsonObject parameter = new JsonObject();
 
-                    argument.add("name",toolAnnotation.arguments()[i].name())
-                            .add("type",toolAnnotation.arguments()[i].Type());
+                    parameter.add("name",toolAnnotation.parameters()[i].name())
+                            .add("type",toolAnnotation.parameters()[i].Type());
 
-                    if(toolAnnotation.arguments()[i].description() != null && !toolAnnotation.arguments()[i].description().isEmpty()) {
-                        argument.add("description",toolAnnotation.arguments()[i].description());
+                    if(toolAnnotation.parameters()[i].description() != null && !toolAnnotation.parameters()[i].description().isEmpty()) {
+                        parameter.add("description",toolAnnotation.parameters()[i].description());
                     }
 
-                    if(toolAnnotation.arguments()[i].required()) {
-                        argument.add("required",true);
-                    }
-                    else
-                    {
-                        argument.add("required",false);
+                    if(toolAnnotation.parameters()[i].required()) {
+                        requiredParameters.addString(toolAnnotation.parameters()[i].name());
                     }
 
-                    if(toolAnnotation.arguments()[i].noNull()) {
-                        argument.add("no_null",true);
-                    }
-                    else
-                    {
-                        argument.add("no_null",false);
-                    }
-
-                    argumentJsonObjects.add(argument);
+                    parametersJsonObjects.add(parameter);
                 }
 
-                arguments.objects(argumentJsonObjects);
-                object.add("arguments",arguments);
+                parameters.objects(parametersJsonObjects);
+                object.add("parameters",parameters);
+                object.add("required_parameters",requiredParameters);
             }
 
             // Add the tool object to the array
@@ -192,6 +181,22 @@ public class OllamaManager {
 
             if(tool == null) {
                 return null;
+            }
+
+            int count = tool.getParameterCount();
+
+            // pass null if the argument is not provided
+            if(count != args.length) {
+                Object[] newArgs = new Object[count];
+                for (int i = 0; i < count; i++) {
+                    if(i < args.length) {
+                        newArgs[i] = args[i];
+                    }
+                    else {
+                        newArgs[i] = null;
+                    }
+                }
+                args = newArgs;
             }
 
             return tool.invoke(getToolClass(toolName).getConstructor().newInstance(), args);
@@ -282,21 +287,75 @@ public class OllamaManager {
     }
 
     private static @NotNull String getFormat(String tools) {
-        return String.format("""
-                You are a helpful AI assistant, you have a score, which can either be good or bad,
-                you need to maintain a good score to be helpful, if you don't maintain a good score then you will be considered unhelpful.
+//        return String.format("""
+//                You are a helpful AI assistant, you have a score, which can either be good or bad,
+//                you need to maintain a good score to be helpful, if you don't maintain a good score then you will be considered unhelpful.
+//
+//                you will try to answer the users need as best as you can and only in JSON format, else you will be given a bad score.
+//
+//                any of the tools description listed below match the specific needs of the query then use the tool to answer the query,
+//                the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
+//
+//                finally if a tool is matched then give response using following schema:
+//
+//                {
+//                    "tooled": true,
+//                    "name": "tool_name",
+//                    "arguments": {
+//                        "argument_name": "value",
+//                        ...
+//                    },
+//                    "reason": "detailed_reason_for_using_tool",
+//                    "match_percentage": Number
+//                }
+//
+//                the tool_name is the name of the tool that you are using, the arguments are the arguments that you are passing to the tool.
+//
+//                following are the rules for tools:
+//                if the tool description does not specify the user's needs then don't respond using a tool else you will be given a bad score.
+//                if you don't pass the required arguments to the tool then you will be given a bad score.
+//                if you pass a null value to a argument that specified NOT_NULL in its description then you will be given a bad score.
+//                if you don't respect the arguments data type and description, you will be given a bad score.
+//                if the tool has response_formatter then use it, else you will be given a bad score.
+//                if the tool's response_formatter has a pre_formatted_response then use it, else you will be given a bad score.
+//                don't add any other variables not defined in the response_variables, else you will be given a bad score.
+//                don't use the tool if user asked specifically for not using tools, else you will be given a bad score.
+//                don't break the order of arguments, else you will be given a bad score.
+//                the reason should not exceed 200 characters, and if it does, you will be given a bad score.
+//
+//                and if you don't follow the schema, you will be given a bad score, but if you follow the schema, you will be given a good score.
+//
+//                if you don't find a tool that match the requirements of the user then respond to the user normally,
+//                and also make the response to be encoded for the JSON format or you will be given a bad score,
+//                and use the following schema:
+//
+//                {
+//                    "tooled": false,
+//                    "response": [
+//                        "paragraph",
+//                        "paragraph",
+//                        ...
+//                    ],
+//                    "rule": "which_rule_used_to_not_use_tool"
+//                }
+//
+//                in the above schema, the response is an array of paragraphs that you want to respond to the user, minimum of 1 paragraph.
+//                each new paragraph should be a new string in the array.
+//                between each paragraph, there should be '\\n'.
+//
+//                %s
+//                """, tools);
 
-                you will try to answer the users need as best as you can and only in JSON format, else you will be given a bad score.
+        String testingFormat = String.format("""
+                You are a helpful Ai Assistant, and you have the power to use tools to answer the user's query,
+                if you find a tool that matches the user's query then use the tool to answer the query.
 
-                any of the tools description listed below match the specific needs of the query then use the tool to answer the query,
-                the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
-
-                finally if a tool is matched then give response using following schema:
+                to use a tool, you need to follow the following schema for response :
 
                 {
-                    "tooled": true,
+                    "tooled": boolean,
                     "name": "tool_name",
-                    "arguments": {
+                    "parameters": {
                         "argument_name": "value",
                         ...
                     },
@@ -304,42 +363,50 @@ public class OllamaManager {
                     "match_percentage": Number
                 }
 
-                the tool_name is the name of the tool that you are using, the arguments are the arguments that you are passing to the tool.
+                There are some rules when using a tool :-
+                    - The response must have tooled true, which means you are using a tool to answer the user's query.
+                    - The name of the tool is required to be defined in the tools list.
+                    - The match_percentage must be greater than or equal to 0.
+                    - The reason must be defined and cannot be empty or contain only spaces.
+                    - Reason must not exceed the length of 100 characters.
+                    - only use parameters that are defined in the specific tool json object.
+                    - the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
+                    - if the tool description does not specify the user's needs then don't respond using a tool.
+                    - you must provide parameters that are defined in the required parameters list.
 
-                following are the rules for tools:
-                if the tool description does not specify the user's needs then don't respond using a tool else you will be given a bad score.
-                if you don't pass the required arguments to the tool then you will be given a bad score.
-                if you pass a null value to a argument that specified NOT_NULL in its description then you will be given a bad score.
-                if you don't respect the arguments data type and description, you will be given a bad score.
-                if the tool has response_formatter then use it, else you will be given a bad score.
-                if the tool's response_formatter has a pre_formatted_response then use it, else you will be given a bad score.
-                don't add any other variables not defined in the response_variables, else you will be given a bad score.
-                don't use the tool if user asked specifically for not using tools, else you will be given a bad score.
-                don't break the order of arguments, else you will be given a bad score.
-                the reason should not exceed 200 characters, and if it does, you will be given a bad score.
+                There are some rules for parameters of the tools :-
+                    - the parameter description is as specific as possible, so don't assume that the argument can be used for anything else.
+                    - the parameter name must be same as the one provided in the tools list.
+                    - Respect the order of parameters.
+                    - don't create any new parameter that are not defined in the tools parameters list.
+                
+                A NotNull argument does not mean that argument is required, it means that the argument cannot be a `null` value.
 
-                and if you don't follow the schema, you will be given a bad score, but if you follow the schema, you will be given a good score.
+                if you break any of the rules you will be considered unhelpful
 
-                if you don't find a tool that match the requirements of the user then respond to the user normally,
-                and also make the response to be encoded for the JSON format or you will be given a bad score,
-                and use the following schema:
+                if a tool does not match the users requirements then respond using the following schema
 
                 {
-                    "tooled": false,
-                    "response": [
-                        "paragraph",
-                        "paragraph",
-                        ...
-                    ],
-                    "rule": "which_rule_used_to_not_use_tool"
+                     "tooled": false,
+                     "response": [
+                         "paragraph",
+                         "paragraph",
+                         ...
+                     ],
+                     "rule": "which_rule_used_to_not_use_tool"
                 }
 
-                in the above schema, the response is an array of paragraphs that you want to respond to the user, minimum of 1 paragraph.
-                each new paragraph should be a new string in the array.
-                between each paragraph, there should be '\\n'.
+                there are also some rules for the no tool schema, and those are :-
+                    - there must be at least 1 paragraph in the response array.
+                    - a paragraph must not exceed 50 words.
+                    - after each paragraph there must be a \\n character
 
+                the available tools are listed below in json format :-
+                
                 %s
                 """, tools);
+
+        return testingFormat;
     }
 
     public ChatMemory getChatMemory(String userId) {
@@ -364,6 +431,7 @@ public class OllamaManager {
                 .baseUrl(url)
                 .modelName(aiModel)
                 .temperature(TEMPERATURE)
+                .timeout(Duration.ofSeconds(Config.get("OLLAMA_TIMEOUT_SECONDS") == null ? 60 : Integer.parseInt(Config.get("OLLAMA_TIMEOUT_SECONDS"))))
                 .format("json")
                 .build();
 
@@ -392,6 +460,7 @@ public class OllamaManager {
                 .baseUrl(url)
                 .modelName(aiModel)
                 .temperature(TEMPERATURE)
+                .timeout(Duration.ofSeconds(Config.get("OLLAMA_TIMEOUT_SECONDS") == null ? 60 : Integer.parseInt(Config.get("OLLAMA_TIMEOUT_SECONDS"))))
                 .build();
 
         assistant = AiServices.builder(Assistant.class)
@@ -435,6 +504,7 @@ public class OllamaManager {
                 .baseUrl(url)
                 .modelName(aiModel)
                 .temperature(TEMPERATURE)
+                .timeout(Duration.ofSeconds(Config.get("OLLAMA_TIMEOUT_SECONDS") == null ? 60 : Integer.parseInt(Config.get("OLLAMA_TIMEOUT_SECONDS"))))
                 .build();
 
         AiServices<Assistant> assistantAiServices = AiServices.builder(Assistant.class)

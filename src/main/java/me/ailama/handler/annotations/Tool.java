@@ -8,7 +8,7 @@ public @interface Tool {
     String name();
     String description();
 
-    Args[] arguments() default {};
+    Parameter[] parameters() default {};
 
     boolean rawResponse() default false;
 

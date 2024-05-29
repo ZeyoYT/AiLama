@@ -1,14 +1,14 @@
 package me.ailama.tools;
 
-import me.ailama.handler.annotations.Args;
+import me.ailama.handler.annotations.Parameter;
 import me.ailama.handler.annotations.Tool;
 
 public class MathTools {
 
-    @Tool(name = "basicMathOperations", description = "only does Addition (+), Subtraction (-), Multiplication (*), Division (/), Modulus (%), Power (^)", arguments = {
-            @Args(name = "a", Type = "number", noNull = true),
-            @Args(name = "b", Type = "number", noNull = true),
-            @Args(name = "operation_symbol", Type = "string", noNull = true)
+    @Tool(name = "basicMathOperations", description = "only does Addition (+), Subtraction (-), Multiplication (*), Division (/), Modulus (%), Power (^)", parameters = {
+            @Parameter(name = "a", Type = "number"),
+            @Parameter(name = "b", Type = "number"),
+            @Parameter(name = "operation_symbol", Type = "string")
     })
     public String basicMathOperations(Number a, Number b, String operation) {
         return switch (operation) {
@@ -46,9 +46,9 @@ public class MathTools {
         return String.valueOf(Math.pow(a.doubleValue(), b.doubleValue()));
     }
 
-    @Tool(name = "squareOrCube", description = "Square or cube of a number, symbols are square_root and cube_root", arguments = {
-            @Args(name = "a", Type = "number"),
-            @Args(name = "operation_symbol", Type = "string")
+    @Tool(name = "squareOrCube", description = "Square or cube of a number, symbols are square_root and cube_root", parameters = {
+            @Parameter(name = "a", Type = "number"),
+            @Parameter(name = "operation_symbol", Type = "string")
     })
     public String squareOrCube(Number a, String operation) {
         return switch (operation) {

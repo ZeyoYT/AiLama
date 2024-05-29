@@ -17,12 +17,17 @@ public class JsonArray {
             return this;
         }
 
-    public JsonArray objects(List<JsonObject> jsonObjects) {
-        for(JsonObject jsonObject : jsonObjects) {
-            jsonBuilder.append(jsonObject.build()).append(",");
+        public JsonArray objects(List<JsonObject> jsonObjects) {
+            for(JsonObject jsonObject : jsonObjects) {
+                jsonBuilder.append(jsonObject.build()).append(",");
+            }
+            return this;
         }
-        return this;
-    }
+
+        public JsonArray addString(String value) {
+            jsonBuilder.append("\"").append(value).append("\",");
+            return this;
+        }
 
         public String build() {
 
