@@ -187,32 +187,8 @@ _Docker Image is Available at [Docker Hub](https://hub.docker.com/r/zeyoog/ailam
 
 ### Using Docker Compose :-
 #### Docker Compose File :
-```yaml
-version: '3.8'
+https://github.com/ZeyoYT/AiLama/blob/0f4dbfabf7440ae73d7019acf3c9fa0b3e74ab1f/docker-compose.yaml#L1-L20
 
-services:
-  app:
-    image: ailama:latest
-    environment:
-      - TOKEN=<YOUR_BOT_TOKEN>
-      - OLLAMA_URL=<YOUR_OLLAMA_URL>
-      - OLLAMA_PORT=<YOUR_OLLAMA_PORT>
-      - OLLAMA_MODEL=<YOUR_OLLAMA_MODEL>
-      - OLLAMA_EMBEDDING_MODEL=<YOUR_OLLAMA_EMBEDDING_MODEL>
-      - DEV_ID=<YOUR_DISCORD_ID>
-      # Optional Parameters :-
-      # Write inside single quotes and the user ids separated by commas, if you dont want to use this feature, just write '' (empty string enclosed by single quotes)
-      - OLLAMA_CHAT_MEMORY_UPTO=<NUMBER_OF_MESSAGES_TO_REMEMBER>
-      - WHITELISTED_USERS='<user_id1>,<user_id2>,<user_id3> ... <user_idN>'
-      - SEARXNG_URL=<YOUR_SEARXNG_URL>
-      - SEARXNG_PORT=<YOUR_SEARXNG_PORT>
-      - SEARXNG_ENGINES=<YOUR_SEARXNG_ENGINES>
-      - AUTOMATIC1111_URL=<YOUR_AUTOMATIC1111_URL>
-      - AUTOMATIC1111_PORT=<YOUR_AUTOMATIC1111_PORT>
-      - AUTOMATIC1111_STEPS=<STEPS_FOR_IMAGE_GENERATION>
-      - AUTOMATIC1111_SAMPLER_NAME=<SAMPLER_NAME>
-      - AUTOMATIC1111_SCHEDULER_TYPE=<SCHEDULER_TYPE>
-```
 #### Run Command :
 ```
 docker-compose up -d
