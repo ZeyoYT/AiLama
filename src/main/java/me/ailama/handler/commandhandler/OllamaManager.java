@@ -179,6 +179,10 @@ public class OllamaManager {
         return getTool(toolName) != null && getTool(toolName).getAnnotation(Tool.class).rawResponse();
     }
 
+    public boolean isToolResponseFormatted(String toolName) {
+        return getTool(toolName) != null && getTool(toolName).getAnnotation(Tool.class).responseFormatter();
+    }
+
     // Execute the Tool
     public Object executeTool(String toolName, Object... args) {
 

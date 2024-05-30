@@ -31,11 +31,4 @@ public class UtilityTools {
 
         return gson.toJson(jsonElement);
     }
-
-    @Tool(name = "testTool", description = "Test the tool", parameters = {
-            @Parameter(name = "fruitName", Type = "string")
-    }, responseFormatter = true)
-    public String testTool(String resp) {
-        return resp;
-    }
 }

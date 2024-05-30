@@ -151,9 +151,8 @@ public class AiCommand implements AiLamaSlashCommand {
                     else
                     {
                         // if tooled.response contains a string that has ({response}) in it, replace it with the result of the tool
-                        if(tooled.response != null && tooled.response.length > 0) {
+                        if(OllamaManager.getInstance().isToolResponseFormatted(tooled.name)) {
 
-                            System.out.println(Arrays.toString(tooled.response));
                             response = String.join("\n\n", tooled.response).replace("({response})", OllamaManager.getInstance().executeTool(tooled.name, tooled.parameters.values().toArray()).toString());
 
                         }
