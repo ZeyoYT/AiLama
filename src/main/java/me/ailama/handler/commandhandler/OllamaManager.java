@@ -28,6 +28,7 @@ import org.jsoup.Jsoup;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -146,10 +147,16 @@ public class OllamaManager {
                 object.add("required_parameters",requiredParameters);
             }
 
+            // response formatter
+            if(toolAnnotation.responseFormatter()) {
+
+                object.add("response_formatter","({response})");
+
+            }
+
             // Add the tool object to the array
             toolJsonObjects.add(object);
         });
-
 
         return toolJsonArray.objects(toolJsonObjects);
     }
@@ -359,9 +366,21 @@ public class OllamaManager {
                         "argument_name": "value",
                         ...
                     },
+                    "response": [
+                        "paragraph",
+                        "paragraph",
+                        ...
+                    ],
                     "reason": "detailed_reason_for_using_tool",
                     "match_percentage": Number
                 }
+                
+                A Response Formatter may be provided for the tool, its used for formatting the response of the tool,
+                the response formatter will contain of response variables, return a response like :-
+                "response": [
+                    ".. text .. ({response_variable}) ...",
+                    ...
+                ]
 
                 There are some rules when using a tool :-
                     - The response must have tooled true, which means you are using a tool to answer the user's query.
@@ -373,6 +392,7 @@ public class OllamaManager {
                     - the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
                     - if the tool description does not specify the user's needs then don't respond using a tool.
                     - you must provide parameters that are defined in the required parameters list.
+                    - you would be provided with a user id, you can only use it for passing it to parameter as a value.
 
                 There are some rules for parameters of the tools :-
                     - the parameter description is as specific as possible, so don't assume that the argument can be used for anything else.
@@ -380,9 +400,14 @@ public class OllamaManager {
                     - Respect the order of parameters.
                     - don't create any new parameter that are not defined in the tools parameters list.
                 
-                A NotNull argument does not mean that argument is required, it means that the argument cannot be a `null` value.
-
-                if you break any of the rules you will be considered unhelpful
+                There are some rules for the response array if response_formatter is not null:-
+                    - there must be at least 1 paragraph in the response array.
+                    - a paragraph must not exceed 50 words.
+                    - after each paragraph there must be a \\n character
+                
+                when a tool provides you with a response formatter, you must use it to format the response of the tool like :-
+                    user: "what is the time?"
+                    response: "The time is ({response})"
 
                 if a tool does not match the users requirements then respond using the following schema
 
@@ -396,10 +421,7 @@ public class OllamaManager {
                      "rule": "which_rule_used_to_not_use_tool"
                 }
 
-                there are also some rules for the no tool schema, and those are :-
-                    - there must be at least 1 paragraph in the response array.
-                    - a paragraph must not exceed 50 words.
-                    - after each paragraph there must be a \\n character
+                if you break any of the rules you will be considered unhelpful
 
                 the available tools are listed below in json format :-
                 

@@ -1,5 +1,9 @@
 package me.ailama.tools;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import me.ailama.handler.annotations.Parameter;
 import me.ailama.handler.annotations.Tool;
 import me.ailama.handler.commandhandler.OllamaManager;
@@ -22,6 +26,16 @@ public class UtilityTools {
 
     @Tool(name = "toolsJson", description = "Get all the tools available to use")
     public String toolsJson() {
-        return OllamaManager.getInstance().getFinalJson().build();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonElement jsonElement = JsonParser.parseString(OllamaManager.getInstance().getFinalJson().build());
+
+        return gson.toJson(jsonElement);
+    }
+
+    @Tool(name = "testTool", description = "Test the tool", parameters = {
+            @Parameter(name = "fruitName", Type = "string")
+    }, responseFormatter = true)
+    public String testTool(String resp) {
+        return resp;
     }
 }

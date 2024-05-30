@@ -5,11 +5,11 @@ import me.ailama.handler.annotations.Tool;
 
 public class MathTools {
 
-    @Tool(name = "basicMathOperations", description = "only does Addition (+), Subtraction (-), Multiplication (*), Division (/), Modulus (%), Power (^)", parameters = {
+    @Tool(name = "basicMathOperations", description = "only does Addition, Subtraction, Multiplication, Division, Modulus, Power", parameters = {
             @Parameter(name = "a", Type = "number"),
             @Parameter(name = "b", Type = "number"),
-            @Parameter(name = "operation_symbol", Type = "string")
-    })
+            @Parameter(name = "operation_symbol", Type = "STRING{+,-,*,/,%,^}")
+    }, responseFormatter = true)
     public String basicMathOperations(Number a, Number b, String operation) {
         return switch (operation) {
             case "+" -> add(a, b);
@@ -46,10 +46,10 @@ public class MathTools {
         return String.valueOf(Math.pow(a.doubleValue(), b.doubleValue()));
     }
 
-    @Tool(name = "squareOrCube", description = "Square or cube of a number, symbols are square_root and cube_root", parameters = {
+    @Tool(name = "squareOrCube", description = "Square or cube root of a number", parameters = {
             @Parameter(name = "a", Type = "number"),
-            @Parameter(name = "operation_symbol", Type = "string")
-    })
+            @Parameter(name = "operation_symbol", Type = "STRING{square_root,cube_root}")
+    }, responseFormatter = true)
     public String squareOrCube(Number a, String operation) {
         return switch (operation) {
             case "square_root" -> sqrt(a);

@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import me.ailama.handler.annotations.Parameter;
 import me.ailama.handler.annotations.Tool;
+import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.main.Main;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import okhttp3.*;
@@ -19,7 +20,7 @@ public class ApiTools {
             @Parameter(name = "amount", Type = "double", description = "Amount to convert"),
             @Parameter(name = "currency1", Type = "string", description = "Currency to convert from, Like INR"),
             @Parameter(name = "currency2", Type = "string", description = "Currency to convert to, Like USD")
-    })
+    }, responseFormatter = true)
     public String currencyRate(Double amount, String currency1, String currency2) {
         final double finalRate = Double.parseDouble(getRates(currency1.toLowerCase(),currency2.toLowerCase()));
         final double conv = finalRate * amount;
@@ -99,6 +100,14 @@ public class ApiTools {
         } catch (Exception e) {
             return "Error in calling the api \n\n" + rawResponse;
         }
+    }
+
+    @Tool(name = "ai", description = "Simple AI to respond to messages", parameters = {
+            @Parameter(name = "message", Type = "string", description = "Message to respond to"),
+            @Parameter(name = "user_id", Type = "string", description = "User ID")
+    })
+    public String ai(String message, String userId) {
+        return OllamaManager.getInstance().createAssistant(null, userId).chat(userId, message);
     }
 
     public static boolean isJSONValid(String jsonInString ) {

@@ -1,5 +1,6 @@
 package me.ailama.commands;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.commandhandler.SearXNGManager;
@@ -15,7 +16,11 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.utils.data.DataObject;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -111,7 +116,7 @@ public class AiCommand implements AiLamaSlashCommand {
         {
             // generate normal response based on the query if the url option is not provided or the web option is not provided
             if(isTooledQuery) {
-                response = OllamaManager.getInstance().getTooledAssistant(modelOption, userId, null).answer(queryOption.replaceFirst(".", ""));
+                response = OllamaManager.getInstance().getTooledAssistant(modelOption, userId, null).answer(queryOption.replaceFirst(".", "") + "\n\n" + "user_id:" + userId);
             }
             else
             {
@@ -145,7 +150,17 @@ public class AiCommand implements AiLamaSlashCommand {
                     }
                     else
                     {
-                        response = OllamaManager.getInstance().executeTool(tooled.name, tooled.parameters.values().toArray()).toString();
+                        // if tooled.response contains a string that has ({response}) in it, replace it with the result of the tool
+                        if(tooled.response != null && tooled.response.length > 0) {
+
+                            System.out.println(Arrays.toString(tooled.response));
+                            response = String.join("\n\n", tooled.response).replace("({response})", OllamaManager.getInstance().executeTool(tooled.name, tooled.parameters.values().toArray()).toString());
+
+                        }
+                        else
+                        {
+                            response = OllamaManager.getInstance().executeTool(tooled.name, tooled.parameters.values().toArray()).toString();
+                        }
                     }
                 }
             }

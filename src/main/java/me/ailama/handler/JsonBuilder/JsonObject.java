@@ -26,20 +26,16 @@ public class JsonObject {
     }
 
     public JsonObject add(String key, Object value) {
-        if(value instanceof String) {
-            string(key, (String) value);
-        } else if(value instanceof Number) {
-            number(key, (Number) value);
-        } else if(value instanceof Boolean) {
-            bool(key, (Boolean) value);
-        } else if(value instanceof List) {
-            array(key, (List<?>) value);
-        } else if(value instanceof JsonArray) {
-            array(key, (JsonArray) value);
-        } else if(value instanceof JsonObject) {
-            object(key, (JsonObject) value);
-        } else if (value == null) {
-            nullKey(key);
+        switch (value) {
+            case String s -> string(key, s);
+            case Number number -> number(key, number);
+            case Boolean b -> bool(key, b);
+            case List<?> list -> array(key, list);
+            case JsonArray jsonArray -> array(key, jsonArray);
+            case JsonObject jsonObject -> object(key, jsonObject);
+            case null -> nullKey(key);
+            default -> {
+            }
         }
 
         return this;

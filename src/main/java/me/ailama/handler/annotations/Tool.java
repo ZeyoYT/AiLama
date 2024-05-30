@@ -12,5 +12,5 @@ public @interface Tool {
 
     boolean rawResponse() default false;
 
-    ResponseFormatter responseFormatter() default @ResponseFormatter(responseOrder = {}, responseVariables = {}, preFormattedResponse = "", isPreFormatted = false, isResponseOrder = false);
+   boolean responseFormatter() default false;
 }
