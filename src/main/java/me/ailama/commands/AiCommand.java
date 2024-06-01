@@ -18,10 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.utils.data.DataObject;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class AiCommand implements AiLamaSlashCommand {
@@ -153,12 +150,12 @@ public class AiCommand implements AiLamaSlashCommand {
                         // if tooled.response contains a string that has ({response}) in it, replace it with the result of the tool
                         if(OllamaManager.getInstance().isToolResponseFormatted(tooled.name)) {
 
-                            response = String.join("\n\n", tooled.response).replace("({response})", OllamaManager.getInstance().executeTool(tooled.name, tooled.parameters.values().toArray()).toString());
+                            response = String.join("\n\n", tooled.response).replace("({response})", OllamaManager.getInstance().executeTool(tooled.name, tooled.parameters != null ? tooled.parameters.values().toArray() : List.of().toArray()).toString());
 
                         }
                         else
                         {
-                            response = OllamaManager.getInstance().executeTool(tooled.name, tooled.parameters.values().toArray()).toString();
+                            response = OllamaManager.getInstance().executeTool(tooled.name, tooled.parameters != null ? tooled.parameters.values().toArray() : List.of().toArray()).toString();
                         }
                     }
                 }
