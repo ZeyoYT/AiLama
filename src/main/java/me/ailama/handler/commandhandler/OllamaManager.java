@@ -9,6 +9,8 @@ import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
+import dev.langchain4j.model.ollama.OllamaModel;
+import dev.langchain4j.model.ollama.OllamaModels;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
@@ -28,7 +30,6 @@ import org.jsoup.Jsoup;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class OllamaManager {
     private static OllamaManager ollama;
 
     private final String url;
-    private final String model;
+    private String model;
     private final String embeddingModel;
 
     private final HashMap<String,Method> tools;
@@ -581,6 +582,26 @@ public class OllamaManager {
 
         return OllamaManager.getInstance().createAssistant(documents, model, null, userId);
 
+    }
+
+    public void setModel(String model) {
+        if(!hasModel(model)) {
+            throw new IllegalArgumentException("Model does not exist");
+        }
+
+        this.model = model;
+    }
+
+    public boolean hasModel(String model) {
+        return getModels().contains(model);
+    }
+
+    public List<String> getModels() {
+        OllamaModels models = OllamaModels.builder()
+                .baseUrl(url)
+                .build();
+
+        return models.availableModels().content().stream().map(OllamaModel::getName).toList();
     }
 
     public static OllamaManager getInstance() {
