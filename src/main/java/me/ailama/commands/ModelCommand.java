@@ -4,6 +4,9 @@ import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.IntegrationType;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -12,7 +15,13 @@ public class ModelCommand implements AiLamaSlashCommand {
     @Override
     public SlashCommandData getCommandData() {
         return Commands.slash("model","switch model for current session")
-                .addOption(OptionType.STRING, "model_name", "The model you want to switch to", true);
+                .setIntegrationTypes(IntegrationType.USER_INSTALL)
+                .setContexts(InteractionContextType.ALL)
+                .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+
+                .addOption(OptionType.STRING, "model_name", "The model you want to switch to", true)
+
+                .setNSFW(false);
     }
 
     @Override
