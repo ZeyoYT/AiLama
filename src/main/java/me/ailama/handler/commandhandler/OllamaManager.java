@@ -28,6 +28,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 
 import java.lang.reflect.Method;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -604,11 +607,44 @@ public class OllamaManager {
         return models.availableModels().content().stream().map(OllamaModel::getName).toList();
     }
 
+    public boolean checkOllamaServer() {
+
+        String ollamaUrl = Config.get("OLLAMA_URL").replaceFirst("^(http://|https://)", "").replaceAll("/$", "");
+
+        try {
+            InetAddress address = InetAddress.getByName(ollamaUrl);
+            int port = Integer.parseInt(Config.get("OLLAMA_PORT"));
+
+            Socket socket = new Socket(address, port);
+            boolean state = socket.isConnected();
+
+            // Close the socket connection after checking
+            socket.close();
+
+            return state;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public String getCurrentModel() {
+        return model;
+    }
+
+    public boolean hasMemoryEnabled() {
+        return chatMemoryLimit > 1;
+    }
+
+    public int getChatMemorySize() {
+        return chatMemoryLimit;
+    }
+
     public static OllamaManager getInstance() {
         if (OllamaManager.ollama == null) {
             OllamaManager.ollama = new OllamaManager();
         }
         return OllamaManager.ollama;
     }
-
 }

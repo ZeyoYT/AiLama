@@ -24,19 +24,24 @@ import java.util.regex.Pattern;
 public class AiCommand implements AiLamaSlashCommand {
 
     public SlashCommandData getCommandData() {
-        return Commands.slash("ai","ask ai (ollama)")
+        SlashCommandData slashCommandData = Commands.slash("ai", "ask ai (ollama)")
                 .setIntegrationTypes(IntegrationType.USER_INSTALL)
                 .setContexts(InteractionContextType.ALL)
                 .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
 
                 .addOption(OptionType.STRING, "ask", "The query you want to ask", true)
-                .addOption(OptionType.BOOLEAN, "web", "If you want the response based on web search", false)
                 .addOption(OptionType.STRING, "model", "Example (gemma:2b)", false)
                 .addOption(OptionType.BOOLEAN, "ephemeral", "If you want the response to be ephemeral", false)
                 .addOption(OptionType.STRING, "url", "The Url of website for RAG", false)
                 .addOption(OptionType.BOOLEAN, "reset-session", "If you want reset chat memory", false)
 
                 .setNSFW(false);
+
+        if(SearXNGManager.getInstance().isSearXNGEnabled()) {
+            slashCommandData.addOption(OptionType.BOOLEAN, "web", "If you want the response based on web search", false);
+        }
+
+        return slashCommandData;
     }
 
     public void handleCommand(SlashCommandInteractionEvent event) {

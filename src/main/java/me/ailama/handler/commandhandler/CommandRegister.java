@@ -20,6 +20,7 @@ public class CommandRegister {
         addCommand(new DocumentCommand(), true);
         addCommand(new ImageCommand(), Automatic1111Manager.getInstance().isAutomatic1111Enabled());
         addCommand(new ModelCommand(), true);
+        addCommand(new InfoCommand(), true);
     }
 
     public AiLamaSlashCommand getCommand(String name) {

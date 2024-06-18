@@ -79,7 +79,7 @@ public class SearXNGManager {
         - If the URL is in the forbidden list, it will be removed
     */
     public SearXNGResult bestMatch(SearXNG searXNG) {
-        SearXNGResult bestResult = searXNG.results.get(0);
+        SearXNGResult bestResult = searXNG.results.getFirst();
 
         double bestMatchScore = bestResult.score;
 
