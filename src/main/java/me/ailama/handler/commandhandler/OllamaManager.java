@@ -28,9 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 
 import java.lang.reflect.Method;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.*;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +39,7 @@ public class OllamaManager {
     public static final double TEMPERATURE = 0.4;
     private static OllamaManager ollama;
 
-    private final String url;
+    private String url;
     private String model;
     private final String embeddingModel;
 
@@ -399,7 +397,7 @@ public class OllamaManager {
                     - only use parameters that are defined in the specific tool json object.
                     - the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
                     - if the tool description does not specify the user's needs then don't respond using a tool.
-                    - you must provide parameters that are defined in the required parameters list.
+                    - you must provide parameters that are defined in the required parameters list, if its required but not given then generate the value.
                     - you would be provided with a user id, you can only use it for passing it to parameter as a value.
 
                 There are some rules for parameters of the tools :-
@@ -600,6 +598,7 @@ public class OllamaManager {
     }
 
     public List<String> getModels() {
+
         OllamaModels models = OllamaModels.builder()
                 .baseUrl(url)
                 .build();
@@ -609,11 +608,11 @@ public class OllamaManager {
 
     public boolean checkOllamaServer() {
 
-        String ollamaUrl = Config.get("OLLAMA_URL").replaceFirst("^(http://|https://)", "").replaceAll("/$", "");
-
         try {
-            InetAddress address = InetAddress.getByName(ollamaUrl);
-            int port = Integer.parseInt(Config.get("OLLAMA_PORT"));
+            String fixedUrl = getUrl();
+
+            InetAddress address = InetAddress.getByName(fixedUrl);
+            int port = Integer.parseInt(AiLama.getInstance().fixUrl(url).split(":")[2]);
 
             Socket socket = new Socket(address, port);
             boolean state = socket.isConnected();
@@ -624,9 +623,38 @@ public class OllamaManager {
             return state;
         }
         catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
+
+    }
+
+    public boolean setUrl(String newUrl, long port) {
+        try {
+
+            String hostname = URI.create(newUrl).getHost();
+            InetAddress address = InetAddress.getByName(hostname);
+
+            Socket socket = new Socket(address, (int) port);
+            boolean state = socket.isConnected();
+
+            if(state) {
+                url = newUrl + ":" + port;
+            }
+
+            socket.close();
+            return state && checkOllamaServer();
+        }
+        catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getUrl() {
+        return AiLama.getInstance().fixUrl(url).split(":")[1].replaceAll("/", "");
+    }
+
+    public String getPort() {
+        return AiLama.getInstance().fixUrl(url).split(":")[2];
     }
 
     public String getCurrentModel() {

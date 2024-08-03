@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 
 public class ImageCommand implements AiLamaSlashCommand {
     @Override
+
     public SlashCommandData getCommandData() {
         return Commands.slash("image","generate a image (automatic1111)")
                 .setIntegrationTypes(IntegrationType.USER_INSTALL)

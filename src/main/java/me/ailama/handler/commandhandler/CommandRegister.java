@@ -21,6 +21,7 @@ public class CommandRegister {
         addCommand(new ImageCommand(), Automatic1111Manager.getInstance().isAutomatic1111Enabled());
         addCommand(new ModelCommand(), true);
         addCommand(new InfoCommand(), true);
+        addCommand(new ChangeConnectionCommand(), true);
     }
 
     public AiLamaSlashCommand getCommand(String name) {

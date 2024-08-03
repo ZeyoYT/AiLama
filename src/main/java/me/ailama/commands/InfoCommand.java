@@ -33,8 +33,8 @@ public class InfoCommand implements AiLamaSlashCommand {
 
         event.deferReply().setEphemeral(true).queue();
 
-        String ollamaUrl = Config.get("OLLAMA_URL");
-        String ollamaPort = Config.get("OLLAMA_PORT");
+        String ollamaUrl = OllamaManager.getInstance().getUrl();
+        String ollamaPort = String.valueOf(OllamaManager.getInstance().getPort());
 
         String isOllamaServerRunning = OllamaManager.getInstance().checkOllamaServer() ? "Yes" : "No";
         String currentModel = OllamaManager.getInstance().getCurrentModel();
