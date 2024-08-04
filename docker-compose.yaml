@@ -10,7 +10,7 @@ services:
       - OLLAMA_MODEL=<YOUR_OLLAMA_MODEL>
       - OLLAMA_EMBEDDING_MODEL=<YOUR_OLLAMA_EMBEDDING_MODEL>
       - OLLAMA_CHAT_MEMORY_UPTO=<NUMBER_OF_MESSAGES_TO_REMEMBER>
-      - DEV_ID=<YOUR_DISCORD_ID>
+      - USER_ID=<YOUR_DISCORD_ID>
       # Optional Parameters :-
       # Write inside single quotes and the user ids separated by commas, if you dont want to use this feature, just write '' (empty string enclosed by single quotes)
       - OLLAMA_TIMEOUT_SECONDS=<OLLAMA_TIMEOUT_SECONDS>

@@ -1,5 +1,6 @@
 package me.ailama.commands;
 
+import me.ailama.config.Config;
 import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
 import me.ailama.main.AiLama;
@@ -33,6 +34,11 @@ public class ChangeConnectionCommand implements AiLamaSlashCommand {
         }
         else {
             event.deferReply().queue();
+        }
+
+        if(!event.getUser().getId().equals(Config.get("USER_ID"))) {
+            event.getHook().sendMessage("You are not authorized to use this command").queue();
+            return;
         }
 
         // Set Configurations

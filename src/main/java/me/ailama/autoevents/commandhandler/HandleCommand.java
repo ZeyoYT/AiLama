@@ -18,14 +18,14 @@ public class HandleCommand extends ListenerAdapter {
         String[] whitelistArray = whitelist.split(", ");
 
         ArrayList<String> whitelistedUsers = new ArrayList<>(Arrays.asList(whitelistArray));
-        whitelistedUsers.add(Config.get("DEV_ID"));
+        whitelistedUsers.add(Config.get("USER_ID"));
 
         if(!whitelistedUsers.contains(event.getUser().getId())) {
 
-            event.getJDA().retrieveUserById(Config.get("DEV_ID")).queue(user -> {
+            event.getJDA().retrieveUserById(Config.get("USER_ID")).queue(user -> {
                 event.reply("You are not allowed to use this command. its only made for " + user.getAsMention() + "or a select few whitelisted people").setEphemeral(true).queue();
             }, err -> {
-                event.reply("You are not allowed to use this command. its only made for the developer or a select few whitelisted people").setEphemeral(true).queue();
+                event.reply("You are not allowed to use this command. its only for a select few whitelisted people and Bot Owner").setEphemeral(true).queue();
             });
 
             return;

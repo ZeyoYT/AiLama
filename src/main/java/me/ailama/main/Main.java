@@ -49,11 +49,11 @@ public class Main {
 
         shardManager = builder.build();
 
-        if(shardManager.retrieveUserById(Config.get("DEV_ID")).complete() != null) {
+        if(shardManager.retrieveUserById(Config.get("USER_ID")).complete() != null) {
             LOGGER.info("Bot is ready to use");
         }
         else {
-            LOGGER.error("Bot is not ready to use because the developer id is not valid. Please check the developer id in the config file.");
+            LOGGER.error("Bot is not ready to use because the user id is not valid. Please check the user id in the config file.");
             System.exit(0);
         }
     }
@@ -82,8 +82,8 @@ public class Main {
             flag = false;
         }
 
-        if(Config.get("DEV_ID") == null) {
-            LOGGER.error("DEV_ID environment variable is missing");
+        if(Config.get("USER_ID") == null) {
+            LOGGER.error("USER_ID environment variable is missing");
             flag = false;
         }
 

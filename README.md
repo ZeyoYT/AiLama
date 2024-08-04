@@ -205,7 +205,7 @@ docker pull zeyoog/ailama
 
 #### Run Command :
 ```
-docker run -e "TOKEN=<bot token>" -e OLLAMA_URL=<ollama_host_url> -e OLLAMA_PORT=<ollama_port> -e OLLAMA_MODEL=<ollama_model> -e OLLAMA_EMBEDDING_MODEL=<ollama_embedding_model> -e DEV_ID=<developer_id> -e "WHITELISTED_USERS='<whitelisted_user_id>, <whitelisted_user_id>'" ailama:latest
+docker run -e "TOKEN=<bot token>" -e OLLAMA_URL=<ollama_host_url> -e OLLAMA_PORT=<ollama_port> -e OLLAMA_MODEL=<ollama_model> -e OLLAMA_EMBEDDING_MODEL=<ollama_embedding_model> -e USER_ID=<developer_id> -e "WHITELISTED_USERS='<whitelisted_user_id>, <whitelisted_user_id>'" ailama:latest
 ```
 
 <br>
@@ -230,7 +230,7 @@ docker build -t ailama:latest .
 
 __3. Run Docker Container :__
 ```
-docker run -e "TOKEN=<bot token>" -e OLLAMA_URL=<ollama_host_url> -e OLLAMA_PORT=<ollama_port> -e OLLAMA_MODEL=<ollama_model> -e OLLAMA_EMBEDDING_MODEL=<ollama_embedding_model> -e DEV_ID=<developer_id> -e "WHITELISTED_USERS='<whitelisted_user_id>, <whitelisted_user_id>'" ailama:latest
+docker run -e "TOKEN=<bot token>" -e OLLAMA_URL=<ollama_host_url> -e OLLAMA_PORT=<ollama_port> -e OLLAMA_MODEL=<ollama_model> -e OLLAMA_EMBEDDING_MODEL=<ollama_embedding_model> -e USER_ID=<developer_id> -e "WHITELISTED_USERS='<whitelisted_user_id>, <whitelisted_user_id>'" ailama:latest
 ```
 
 <br>
