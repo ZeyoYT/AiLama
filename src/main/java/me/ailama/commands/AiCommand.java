@@ -63,6 +63,7 @@ public class AiCommand implements AiLamaSlashCommand {
         boolean resetSession = event.getOption("reset-session") != null && event.getOption("reset-session").getAsBoolean();
 
         String response = "";
+        String sourceString = "";
         String urlForContent = null;
 
 
@@ -107,11 +108,6 @@ public class AiCommand implements AiLamaSlashCommand {
 
             if(assistant != null) {
                 response = assistant.chat(userId,queryOption);
-
-                // add the source of the content to the response
-                if(response != null && !isTooledQuery) {
-                    response += "\n\nSource: <" + (urlForContent != null ? urlForContent : urlOption) + ">";
-                }
             }
         }
         else
@@ -132,6 +128,11 @@ public class AiCommand implements AiLamaSlashCommand {
                 response = response.replace("_QUOTE_", "\"");
             }
 
+        }
+
+        // add the source of the content to the response
+        if(response != null && !isTooledQuery && (urlOption != null || urlForContent != null)) {
+            sourceString += "\n\nSource: <" + (urlForContent != null ? urlForContent : urlOption) + ">";
         }
 
         if(isTooledQuery) {
@@ -171,13 +172,22 @@ public class AiCommand implements AiLamaSlashCommand {
             }
         }
 
+        String nullResponse = "I'm sorry, I don't understand what you're saying. did you provide the correct options?";
 
         if(response == null || response.isEmpty()) {
-            response = "I'm sorry, I don't understand what you're saying. did you provide the correct options?";
+            response = nullResponse;
         }
 
-        if(response.length() > 2000) {
+        if(!response.equals(nullResponse) && !sourceString.isEmpty() && response.length() + sourceString.length() < 2000) {
+            response += sourceString;
+        }
+        else if(response.length() > 2000) {
+
             List<String> responses = AiLama.getInstance().getParts(response, 2000);
+
+            if(!sourceString.isEmpty()) {
+                responses.add(sourceString);
+            }
 
             for(String res : responses) {
                 sendMessage(event, res);

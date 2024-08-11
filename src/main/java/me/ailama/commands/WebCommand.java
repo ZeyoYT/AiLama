@@ -129,10 +129,16 @@ public class WebCommand implements AiLamaSlashCommand {
             source.append("\n\nSome URLs were forbidden and were not included in the source");
         }
 
-        response += source.toString();
+        if(!source.isEmpty() && response.length() + source.length() < 2000) {
+            response += source;
+        }
+        else if(response.length() > 2000) {
 
-        if(response.length() > 2000) {
             List<String> responses = AiLama.getInstance().getParts(response, 2000);
+
+            if(!source.isEmpty()) {
+                responses.add(source.toString());
+            }
 
             for(String res : responses) {
                 sendMessage(event, res);
