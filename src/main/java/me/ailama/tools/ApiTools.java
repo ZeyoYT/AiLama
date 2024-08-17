@@ -57,7 +57,7 @@ public class ApiTools {
             @Parameter(name = "call_type", Type = "STRING{GET,POST}", description = "define the api call type"),
             @Parameter(name = "body", Type = "string", description = "body to pass with the api call"),
     }, rawResponse = true)
-    public String callGetApi(String rawResponse) {
+    public String callApi(String rawResponse) {
 
         DataObject dataObject = DataObject.fromJson(rawResponse).getObject("parameters");
         String url = dataObject.getString("api_url");

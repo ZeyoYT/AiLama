@@ -405,6 +405,7 @@ public class OllamaManager {
                 There are some rules for parameters of the tools :-
                     - the parameter description is as specific as possible, so don't assume that the argument can be used for anything else.
                     - the parameter name must be same as the one provided in the tools list.
+                    - datatype of the parameter can be either STRING, NUMBERS, or BOOLEANS
                     - Respect the order of parameters.
                     - don't create any new parameter that are not defined in the tools parameters list.
                 
