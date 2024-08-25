@@ -61,11 +61,11 @@ public class ChangeConnectionCommand implements AiLamaSlashCommand {
         String message;
 
         if(OllamaManager.getInstance().hasModel(model)) {
-            OllamaManager.getInstance().setModel(model);
+            OllamaManager.getInstance().setModel(model, event.getUser().getId());
             message = "Model switched to " + model;
         }
         else {
-            OllamaManager.getInstance().setModel(firstModel);
+            OllamaManager.getInstance().setModel(firstModel, event.getUser().getId());
             message = "Model switched to " + firstModel + "\nThe Model you provided is invalid, so the model has been set to first model found";
         }
 

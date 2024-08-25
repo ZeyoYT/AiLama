@@ -29,7 +29,7 @@ public class ModelCommand implements AiLamaSlashCommand {
         String model = event.getOption("model_name").getAsString();
 
         if(OllamaManager.getInstance().hasModel(model)) {
-            OllamaManager.getInstance().setModel(model);
+            OllamaManager.getInstance().setModel(model, event.getUser().getId());
 
             event.reply("Model switched to " + model + "\nThe Model has only changed for this session, and on restart will reset to the one in Dot Env file").setEphemeral(true).queue();
             return;
