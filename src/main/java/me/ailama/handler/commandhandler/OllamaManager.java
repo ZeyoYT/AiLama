@@ -416,12 +416,7 @@ public class OllamaManager {
     public Assistant createAssistant(String modelName, String userID) {
 
         Assistant assistant = getAssistantFromID(userID);
-        if(assistant != null && !isTooledAssistant) {
-
-            if(modelName != null && !modelName.equals(model)) {
-                return createAssistant(modelName, userID);
-            }
-
+        if(assistant != null && !isTooledAssistant && modelName != null) {
             return assistant;
         }
 

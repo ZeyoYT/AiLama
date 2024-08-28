@@ -69,6 +69,11 @@ public class AiCommand implements AiLamaSlashCommand {
 
         String userId = event.getUser().getId();
 
+        if(modelOption != null && !OllamaManager.getInstance().hasModel(modelOption)) {
+            event.getHook().sendMessage("The model you provided is invalid, please provide a valid model").setEphemeral(true).queue();
+            return;
+        }
+
         if(resetSession) {
             OllamaManager.getInstance().getChatMemory(userId).clear();
         }
