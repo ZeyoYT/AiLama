@@ -393,7 +393,7 @@ public class OllamaManager {
         return chatMemories.get(userId);
     }
 
-    // Returns a custom Assistant that uses the provided model, allowing for more customization
+    // Returns a custom Assistant that uses the provided model, allowing for more customization, has no memory
     public AiServices<Assistant> createAssistantX(String modelName) {
 
         String aiModel = modelName != null ? modelName : model;

@@ -29,6 +29,7 @@ public class WebCommand implements AiLamaSlashCommand {
 
                 .addOption(OptionType.STRING, "search", "The query you want to search for", true)
                 .addOption(OptionType.BOOLEAN, "for-image", "search for a image", false)
+                .addOption(OptionType.BOOLEAN, "improve_query", "If you want to improve the query by using ai", false)
                 .addOption(OptionType.STRING, "instructions", "additional instructions after getting search result", false)
                 .addOption(OptionType.INTEGER, "limit", "The limit of search results", false)
                 .addOption(OptionType.BOOLEAN, "ephemeral", "If you want the response to be ephemeral", false)
@@ -54,6 +55,7 @@ public class WebCommand implements AiLamaSlashCommand {
         String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
         boolean resetSession = event.getOption("reset-session") != null && event.getOption("reset-session").getAsBoolean();
         boolean imageOnly = event.getOption("for-image") != null && event.getOption("for-image").getAsBoolean();
+        boolean improveQuery = event.getOption("improve_query") != null && event.getOption("improve_query").getAsBoolean();
 
         int limitOption = event.getOption("limit") != null ? event.getOption("limit").getAsInt() : 1;
 
@@ -71,6 +73,13 @@ public class WebCommand implements AiLamaSlashCommand {
         if(limitOption > 10) {
             event.getHook().sendMessage("Limit should be less than equal to 10").setEphemeral(true).queue();
             return;
+        }
+
+        if(improveQuery) {
+            queryOption = OllamaManager.getInstance().createAssistantX(userId).systemMessageProvider(o -> """
+                    You are a helpful assistant! you will be given a query, you need to improve it for getting better search results, your
+                    response should only contain the improved query in plain text and should not contain any other information.
+                    """).build().answer(queryOption);
         }
 
         // Get the URL for the content
