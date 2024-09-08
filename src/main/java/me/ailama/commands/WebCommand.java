@@ -75,6 +75,7 @@ public class WebCommand implements AiLamaSlashCommand {
             return;
         }
 
+        // Improve the query if the option is provided
         if(improveQuery) {
             queryOption = OllamaManager.getInstance().createAssistantX(null).systemMessageProvider(o -> """
                     You are a helpful assistant! you will be given a query, you need to improve it for getting better search results, your
