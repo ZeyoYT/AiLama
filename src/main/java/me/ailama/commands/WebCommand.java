@@ -79,7 +79,8 @@ public class WebCommand implements AiLamaSlashCommand {
         if(improveQuery) {
             queryOption = OllamaManager.getInstance().createAssistantX(null).systemMessageProvider(o -> """
                     You are a helpful assistant! you will be given a query, you need to improve it for getting better search results, your
-                    response should only contain the improved query in plain text and should not contain any other information.
+                    response should only contain the improved query in plain text and should not contain any other information. You may take last
+                    conversation into account while improving the query. If you are unable to improve the query, you can respond with the same query.
                     """).build().answer(queryOption);
         }
 

@@ -529,7 +529,7 @@ public class OllamaManager {
         }
 
         assistants.remove(userId);
-        createAssistant(model, userId);
+        assistants.put(userId, createAssistant(model, userId));
     }
 
     public boolean hasModel(String model) {
