@@ -416,7 +416,8 @@ public class OllamaManager {
     public Assistant createAssistant(String modelName, String userID) {
 
         Assistant assistant = getAssistantFromID(userID);
-        if(assistant != null && !isTooledAssistant && modelName != null) {
+
+        if(assistant != null && !isTooledAssistant && modelName == null) {
             return assistant;
         }
 
@@ -529,7 +530,7 @@ public class OllamaManager {
         }
 
         assistants.remove(userId);
-        assistants.put(userId, createAssistant(model, userId));
+        createAssistant(model, userId);
     }
 
     public boolean hasModel(String model) {
