@@ -363,9 +363,18 @@ public class OllamaManager {
                     - after each paragraph there must be a \\n character
                     - all the response formatter variables must be used
                 
-                when a tool provides you with a response formatter, you must use it to format the response of the tool like :-
-                    user: "what is the time?"
-                    response: "The time is ({response})"
+                when a tool provides you with a response formatter
+                    you must use it to format the response of the tool like :-
+                        user: "what is the time?"
+                        response: "The time is ({response})"
+                        user: "what is my username and age?"
+                        response: "Your Username is : ({full_name}) and your age : ({age})"
+
+                    what wont work in response formatter response :-
+                        user: "what is time?"
+                        response: "The time is {response}"
+                        user: "what is my username and age?"
+                        response: "Your Username is : {(full_name)} and your age : {(age})"
 
                 if a tool does not match the users requirements then respond using the following schema
 
