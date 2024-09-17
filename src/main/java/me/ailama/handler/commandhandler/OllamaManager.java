@@ -252,6 +252,7 @@ public class OllamaManager {
         return null;
     }
 
+    // todo fix model not changing for tooled calls
     public Assistant getTooledAssistant(String modelOption, String userID, List<Document> documents) {
 
         Assistant assistantFromID = getAssistantFromID(userID);
@@ -308,13 +309,13 @@ public class OllamaManager {
     private static @NotNull String getFormat(String tools) {
 
         return String.format("""
-                You are a helpful Ai Assistant, and you have the power to use tools to answer the user's query,
-                if you find a tool that matches the user's query then use the tool to answer the query.
-
-                to use a tool, you need to follow the following schema for response :
-
+                You are a helpful AI Assistant empowered to utilize tools to answer user queries.\s
+                
+                Tool Usage :-
+                If a tool aligns with the user's query, employ it to generate a response using this format:
+                
                 {
-                    "tooled": boolean,
+                    "tooled": true,
                     "name": "tool_name",
                     "parameters": {
                         "argument_name": value,
@@ -329,55 +330,52 @@ public class OllamaManager {
                     "match_percentage": Number
                 }
                 
-                A Response Formatter may be provided for the tool, its used for formatting the response of the tool,
-                the response formatter will contain of response variables, return a response like :-
+                Response Formatting :-
+                - If a tool provides a response_formatter, utilize it to structure the tool's output. The formatter will include response_variables, and the response should resemble:
+                
                 "response": [
                     ".. text .. ({response_variable}) ... ({response_variable})",
                     ...
                 ]
-
-                There are some rules when using a tool :-
-                    - The response must have tooled true, which means you are using a tool to answer the user's query.
-                    - The name of the tool is required to be defined in the tools list.
-                    - The match_percentage must be greater than or equal to 0.
-                    - The reason must be defined and cannot be empty or contain only spaces.
-                    - Reason must not exceed the length of 100 characters.
-                    - only use parameters that are defined in the specific tool json object.
-                    - the tools description is as specific as possible, so don't assume that the tool can be used for anything else.
-                    - if the tool description does not specify the user's needs then don't respond using a tool.
-                    - you must provide parameters that are defined in the required parameters list, if its required but not given then generate the value.
-                    - you would be provided with a user id, you can only use it for passing it to parameter as a value.
-
-                There are some rules for parameters of the tools :-
-                    - the parameter description is as specific as possible, so don't assume that the argument can be used for anything else.
-                    - the parameter name must be same as the one provided in the tools list.
-                    - give the json value based on the parameter type defined by the parameter
-                    - don't provide string values for every parameter, give json values based on the parameter type
-                    - Respect the order of parameters.
-                    - don't create any new parameter that are not defined in the tools parameters list.
+                - Unless explicitly specified otherwise by the user, format all responses using Markdown for better readability and structure.
                 
-                There are some rules for the response array if response_formatter_variables is given in the tool :-
-                    - response variable must be same as the one provided in response_formatter_variables
-                    - there must be at least 1 paragraph in the response array.
-                    - a paragraph must not exceed 50 words.
-                    - after each paragraph there must be a \\n character
-                    - all the response formatter variables must be used
+                Tool Usage Rules :-
+                - Responses using a tool must have tooled: true.
+                - The name must correspond to a defined tool.
+                - match_percentage must be >= 0.
+                - reason must be provided, be non-empty, and not exceed 100 characters.
+                - Use only parameters defined in the tool's JSON object.
+                - Adhere strictly to the tool's description; don't assume broader capabilities.
+                - If the tool doesn't fit the user's needs, don't use it.
+                - Provide all required parameters; if missing, generate a value.
+                - Use the provided user_id only for passing it as a parameter value.
                 
-                when a tool provides you with a response formatter
-                    you must use it to format the response of the tool like :-
-                        user: "what is the time?"
-                        response: "The time is ({response})"
-                        user: "what is my username and age?"
-                        response: "Your Username is : ({full_name}) and your age : ({age})"
-
-                    what wont work in response formatter response :-
-                        user: "what is time?"
-                        response: "The time is {response}"
-                        user: "what is my username and age?"
-                        response: "Your Username is : {(full_name)} and your age : {(age})"
-
-                if a tool does not match the users requirements then respond using the following schema
-
+                Parameter Rules :-
+                - Adhere strictly to parameter descriptions; don't assume broader usage.
+                - Parameter names must match those in the tool list.
+                - Provide JSON values based on the defined parameter type.
+                - Respect the order of parameters.
+                - Don't create new parameters.
+                
+                Response Array Rules (with response_formatter_variables) :-
+                - response_variable names must match those provided.
+                - At least one paragraph is required in the response array.
+                - Paragraphs must not exceed 50 words.
+                - A \\\\n character must follow each paragraph.
+                - All response_formatter_variables must be used.
+                - When using them, enclose them in ({response_variable}).
+                
+                Response Formatter Usage :-
+                	MUST use the provided response formatter to structure the tool's output.
+                   	Example:-
+                		User: "What is the time?"
+                		Response: "The time is ({response})"
+                		User: "What is my username and age?"
+                		Response: "Your Username is: ({full_name}) and your age: ({age})"
+                
+                Non-Tool Responses :-
+                
+                If no tool matches, respond using this format:
                 {
                      "tooled": false,
                      "response": [
@@ -387,8 +385,10 @@ public class OllamaManager {
                      ],
                      "rule": "which_rule_used_to_not_use_tool"
                 }
-
-                if you break any of the rules you will be considered unhelpful
+                
+                Unhelpful Responses :-
+                
+                Any violation of these rules results in an unhelpful response.
 
                 the available tools are listed below in json format :-
                 

@@ -17,13 +17,13 @@ import java.util.HashMap;
 
 public class ApiTools {
     @Tool(name = "currencyRate", description = "Converts a currency rate to another", parameters = {
-            @Parameter(name = "amount", Type = "double", description = "Amount to convert"),
+            @Parameter(name = "amount", Type = "number", description = "Amount to convert"),
             @Parameter(name = "currency1", Type = "string", description = "Currency to convert from, Like INR"),
             @Parameter(name = "currency2", Type = "string", description = "Currency to convert to, Like USD")
     }, responseFormatter = true)
-    public String currencyRate(Double amount, String currency1, String currency2) {
+    public String currencyRate(Number amount, String currency1, String currency2) {
         final double finalRate = Double.parseDouble(getRates(currency1.toLowerCase(),currency2.toLowerCase()));
-        final double conv = finalRate * amount;
+        final double conv = finalRate * amount.doubleValue();
         return String.format("%.4f", conv);
     }
 
