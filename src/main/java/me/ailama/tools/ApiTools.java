@@ -53,7 +53,7 @@ public class ApiTools {
 
     @Tool(name = "callApi", description = "used for calling restful api", parameters = {
             @Parameter(name = "api_url", Type = "string", description = "full api url, like https://api.example.com"),
-            @Parameter(name = "headers", Type = "json_object", description = "headers to pass for the api call"),
+            @Parameter(name = "headers", Type = "OR{json_string, null}", description = "headers in json to pass for the api call"),
             @Parameter(name = "call_type", Type = "STRING{GET,POST}", description = "define the api call type"),
             @Parameter(name = "body", Type = "string", description = "body to pass with the api call"),
     }, rawResponse = true)
@@ -64,10 +64,14 @@ public class ApiTools {
         String callType = dataObject.getString("call_type");
         String body = dataObject.getString("body", null);
 
-        DataObject headersObject = dataObject.getObject("headers");
         HashMap<String, String> headers = new HashMap<>();
-        for (String key : headersObject.keys()) {
-            headers.put(key, headersObject.getString(key));
+
+        if(!dataObject.isNull("headers")) {
+            DataObject headersObject = dataObject.getObject("headers");
+
+            for (String key : headersObject.keys()) {
+                headers.put(key, headersObject.getString(key));
+            }
         }
 
         OkHttpClient client = new OkHttpClient();

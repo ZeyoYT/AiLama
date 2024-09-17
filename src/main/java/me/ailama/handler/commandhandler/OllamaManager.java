@@ -24,8 +24,6 @@ import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
 import me.ailama.main.Main;
 import me.ailama.tools.*;
-import okhttp3.*;
-import okio.Buffer;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 
@@ -154,7 +152,13 @@ public class OllamaManager {
             // response formatter
             if(toolAnnotation.responseFormatter()) {
 
-                object.add("response_formatter","({response})");
+                StringBuilder responseFormatterVars = new StringBuilder();
+
+                for(String s : toolAnnotation.returnVars()) {
+                    responseFormatterVars.append("({").append(s).append("}), ");
+                }
+
+                object.add("response_formatter_variables", responseFormatterVars.substring(0, responseFormatterVars.toString().length() - 2));
 
             }
 
@@ -313,7 +317,7 @@ public class OllamaManager {
                     "tooled": boolean,
                     "name": "tool_name",
                     "parameters": {
-                        "argument_name": "value",
+                        "argument_name": value,
                         ...
                     },
                     "response": [
@@ -328,7 +332,7 @@ public class OllamaManager {
                 A Response Formatter may be provided for the tool, its used for formatting the response of the tool,
                 the response formatter will contain of response variables, return a response like :-
                 "response": [
-                    ".. text .. ({response_variable}) ...",
+                    ".. text .. ({response_variable}) ... ({response_variable})",
                     ...
                 ]
 
@@ -347,14 +351,17 @@ public class OllamaManager {
                 There are some rules for parameters of the tools :-
                     - the parameter description is as specific as possible, so don't assume that the argument can be used for anything else.
                     - the parameter name must be same as the one provided in the tools list.
-                    - datatype of the parameter can be either STRING, NUMBERS, or BOOLEANS
+                    - give the json value based on the parameter type defined by the parameter
+                    - don't provide string values for every parameter, give json values based on the parameter type
                     - Respect the order of parameters.
                     - don't create any new parameter that are not defined in the tools parameters list.
                 
-                There are some rules for the response array if response_formatter is not null:-
+                There are some rules for the response array if response_formatter_variables is given in the tool :-
+                    - response variable must be same as the one provided in response_formatter_variables
                     - there must be at least 1 paragraph in the response array.
                     - a paragraph must not exceed 50 words.
                     - after each paragraph there must be a \\n character
+                    - all the response formatter variables must be used
                 
                 when a tool provides you with a response formatter, you must use it to format the response of the tool like :-
                     user: "what is the time?"

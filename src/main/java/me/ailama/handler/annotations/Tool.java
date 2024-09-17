@@ -10,7 +10,9 @@ public @interface Tool {
 
     Parameter[] parameters() default {};
 
+    String[] returnVars() default {"response"};
+
     boolean rawResponse() default false;
 
-   boolean responseFormatter() default false;
+    boolean responseFormatter() default false;
 }
