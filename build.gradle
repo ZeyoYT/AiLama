@@ -44,14 +44,14 @@ dependencies {
     implementation group: 'io.github.freya022', name: 'JDA', version: '70e5e5ca33'
     implementation group: 'io.github.cdimascio', name: 'java-dotenv', version: '5.2.2'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.6'
-    implementation group: 'dev.langchain4j', name: 'langchain4j-ollama', version: '0.33.0'
+    implementation group: 'dev.langchain4j', name: 'langchain4j-ollama', version: '0.35.0'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.0.0-alpha.14'
     implementation group: 'joda-time', name: 'joda-time', version: '2.12.7'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.17.2'
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
 
-    implementation 'dev.langchain4j:langchain4j-easy-rag:0.33.0'
+    implementation 'dev.langchain4j:langchain4j-easy-rag:0.35.0'
 
 }
 

@@ -24,6 +24,7 @@ import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
 import me.ailama.main.Main;
 import me.ailama.tools.*;
+import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 
@@ -547,6 +548,7 @@ public class OllamaManager {
 
         assistants.remove(userId);
         createAssistant(model, userId);
+        this.model = model;
     }
 
     public boolean hasModel(String model) {
@@ -554,11 +556,7 @@ public class OllamaManager {
     }
 
     public List<String> getModels() {
-
-        OllamaModels models = OllamaModels.builder()
-                .baseUrl(url)
-                .build();
-
+        OllamaModels models = new OllamaModels(url, Duration.ofSeconds(90), 3, false, false);
         return models.availableModels().content().stream().map(OllamaModel::getName).toList();
     }
 
