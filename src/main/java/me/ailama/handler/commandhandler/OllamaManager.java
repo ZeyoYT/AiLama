@@ -34,6 +34,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class OllamaManager {
 
@@ -53,6 +54,8 @@ public class OllamaManager {
 
     private boolean isTooledAssistant = false;
 
+    private Set<String> visionModelFamilies;
+
     public OllamaManager() {
 
         url = AiLama.getInstance().fixUrl(Config.get("OLLAMA_URL") + ":" + Config.get("OLLAMA_PORT"));
@@ -64,6 +67,9 @@ public class OllamaManager {
         classInstanceMap = new HashMap<>();
         assistants = new HashMap<>();
 
+        // static check for vision models based on families
+        visionModelFamilies = Set.of("vision", "mllama", "clip");
+
         addTool(AiLama.getInstance());
         addTool(new MathTools());
         addTool(new ApiTools());
@@ -73,6 +79,8 @@ public class OllamaManager {
 
     /*
         Uses Reflection Library to add the tools to the HashMap with specific annotation
+
+        @param toolClass Object
     */
     public void addTool(Object toolClass) {
 
@@ -175,6 +183,7 @@ public class OllamaManager {
         return tools.get(toolName);
     }
 
+    // Get the Tool Class
     public Class<?> getToolClass(String toolName) {
         for(Class<?> clazz : classInstanceMap.keySet()) {
             if(classInstanceMap.get(clazz).contains(toolName)) {
@@ -184,15 +193,23 @@ public class OllamaManager {
         return null;
     }
 
+    // Check if the Tool requires a raw response
     public boolean isToolRawResponse(String toolName) {
         return getTool(toolName) != null && getTool(toolName).getAnnotation(Tool.class).rawResponse();
     }
 
+    // Check if the Tool requires a response formatter
     public boolean isToolResponseFormatted(String toolName) {
         return getTool(toolName) != null && getTool(toolName).getAnnotation(Tool.class).responseFormatter();
     }
 
-    // Execute the Tool
+    /*
+        Execute the Tool Method
+
+        @param toolName String
+        @param args Object
+        @return Object ( The execution result of the tool method )
+    */
     public Object executeTool(String toolName, Object... args) {
 
         try {
@@ -227,23 +244,29 @@ public class OllamaManager {
         }
     }
 
-    // Get all methods annotated with Tool
+    // Get all methods annotated with Tool annotation
     public static List<Method> getMethodsAnnotated(final Class<?> type) {
+
         final List<Method> methods = new ArrayList<>();
         Class<?> klass = type;
-        while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
+
+        while (klass != Object.class) {
+
+            // need to iterated thought hierarchy in order to retrieve methods from above the current instance
             // iterate though the list of methods declared in the class represented by klass variable, and add those annotated with the specified annotation
             for (final Method method : klass.getDeclaredMethods()) {
                 if (method.isAnnotationPresent(Tool.class)) {
                     methods.add(method);
                 }
             }
+
             // move to the upper class in the hierarchy in search for more methods
             klass = klass.getSuperclass();
         }
         return methods;
     }
 
+    // Get the Assistant from the HashMap using the User ID
     public Assistant getAssistantFromID(String id) {
 
         if(assistants.containsKey(id)) {
@@ -558,6 +581,12 @@ public class OllamaManager {
     public List<String> getModels() {
         OllamaModels models = new OllamaModels(url, Duration.ofSeconds(90), 3, false, false);
         return models.availableModels().content().stream().map(OllamaModel::getName).toList();
+    }
+
+    public boolean checkModelIsVision(String model) {
+        OllamaModels models = new OllamaModels(url, Duration.ofSeconds(90), 3, false, false);
+
+        return models.modelCard(model).content().getDetails().getFamilies().stream().anyMatch(visionModelFamilies::contains);
     }
 
     public boolean checkOllamaServer() {

@@ -18,16 +18,24 @@ public class CommandRegister {
         addCommand(new AiCommand(), true);
         addCommand(new WebCommand(), SearXNGManager.getInstance().isSearXNGEnabled());
         addCommand(new DocumentCommand(), true);
-        addCommand(new ImageCommand(), Automatic1111Manager.getInstance().isAutomatic1111Enabled());
+        addCommand(new ImageCommand(), true);
+        addCommand(new ImageGenerateCommand(), Automatic1111Manager.getInstance().isAutomatic1111Enabled());
         addCommand(new ModelCommand(), true);
+        addCommand(new ModelsCommand(), true);
         addCommand(new InfoCommand(), true);
         addCommand(new ChangeConnectionCommand(), true);
+        addCommand(new ResetSession(), true);
     }
 
     public AiLamaSlashCommand getCommand(String name) {
         return this.slashCommands.get(name);
     }
 
+    /*
+        Get all commands slash data
+
+        @return List<SlashCommandData>
+    */
     public List<SlashCommandData> getCommandsSlashData() {
         List<SlashCommandData> commands = new ArrayList<>();
 
@@ -42,6 +50,13 @@ public class CommandRegister {
         return this.slashCommands;
     }
 
+    /*
+         Add command to the list and enable it to user based on condition
+         if condition is false, command will not be shown to user
+
+            @param command AiLamaSlashCommand
+            @param condition boolean
+    */
     public void addCommand(AiLamaSlashCommand command, boolean condition) {
 
         if(!condition) {
