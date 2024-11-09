@@ -278,6 +278,12 @@ SEARXNG_ENGINES=<SEARXNG_ENGINES>
 - /web
 - /document
 - /image
+- /image-generate
+- /info
+- /model
+- /models
+- /reset_session
+- /seturl
 
 <br>
 
