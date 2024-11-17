@@ -1,4 +1,4 @@
-package me.ailama.commands;
+package me.ailama.commands.slashcommands;
 
 import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.commandhandler.SearXNGManager;
@@ -53,6 +53,7 @@ public class WebCommand implements AiLamaSlashCommand {
         String queryOption = event.getOption("search").getAsString();
         String instructionOption = event.getOption("instructions") != null ? event.getOption("instructions").getAsString() : null;
         String modelOption = event.getOption("model") != null ? event.getOption("model").getAsString() : null;
+
         boolean resetSession = event.getOption("reset-session") != null && event.getOption("reset-session").getAsBoolean();
         boolean imageOnly = event.getOption("for-image") != null && event.getOption("for-image").getAsBoolean();
         boolean improveQuery = event.getOption("improve_query") != null && event.getOption("improve_query").getAsBoolean();
@@ -77,7 +78,7 @@ public class WebCommand implements AiLamaSlashCommand {
 
         // Improve the query if the option is provided
         if(improveQuery) {
-            queryOption = OllamaManager.getInstance().createAssistantX(null).systemMessageProvider(o -> """
+            queryOption = OllamaManager.getInstance().createAssistantX(null, true).systemMessageProvider(o -> """
                     You are a helpful assistant! you will be given a query, you need to improve it for getting better search results, your
                     response should only contain the improved query in plain text and should not contain any other information. You may take last
                     conversation into account while improving the query. If you are unable to improve the query, you can respond with the same query.

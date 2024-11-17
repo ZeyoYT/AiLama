@@ -55,6 +55,7 @@ public class SearXNGManager {
          - it removes the spaces and the brackets
          - removes the quotes if multiple engines are provided
          - if the string is empty, it will be "none"
+         - default engine is duckduckgo
      */
     private static String fixEngineString(String engines) {
         if(engines.startsWith("'") && engines.endsWith("'")) {

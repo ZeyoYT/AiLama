@@ -1,7 +1,11 @@
 package me.ailama.handler.commandhandler;
 
-import me.ailama.commands.*;
+import me.ailama.commands.contextcommands.AiContextCommand;
+import me.ailama.commands.contextcommands.ReplyCommand;
+import me.ailama.commands.slashcommands.*;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
+import me.ailama.handler.interfaces.AiLamaMessageContextCommand;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 import java.util.*;
@@ -10,11 +14,14 @@ public class CommandRegister {
 
     private static CommandRegister instance;
     public HashMap<String,AiLamaSlashCommand> slashCommands;
+    public HashMap<String, AiLamaMessageContextCommand> messageContextCommands;
 
     public CommandRegister() {
 
         this.slashCommands = new HashMap<>();
+        this.messageContextCommands = new HashMap<>();
 
+        // Slash Commands
         addCommand(new AiCommand(), true);
         addCommand(new WebCommand(), SearXNGManager.getInstance().isSearXNGEnabled());
         addCommand(new DocumentCommand(), true);
@@ -25,10 +32,18 @@ public class CommandRegister {
         addCommand(new InfoCommand(), true);
         addCommand(new ChangeConnectionCommand(), true);
         addCommand(new ResetSession(), true);
+
+        // Context Menu Commands
+        addCommand(new AiContextCommand(), true);
+        addCommand(new ReplyCommand(), true);
     }
 
-    public AiLamaSlashCommand getCommand(String name) {
+    public AiLamaSlashCommand getSlashCommand(String name) {
         return this.slashCommands.get(name);
+    }
+
+    public AiLamaMessageContextCommand getUserContextCommand(String name) {
+        return this.messageContextCommands.get(name);
     }
 
     /*
@@ -46,8 +61,39 @@ public class CommandRegister {
         return commands;
     }
 
-    public HashMap<String, AiLamaSlashCommand> getCommandMap() {
+    /*
+        Get all Context menu commands data
+
+        @return List<CommandData>
+    */
+    public List<CommandData> getContextCommandsData() {
+        List<CommandData> commands = new ArrayList<>();
+
+        for(AiLamaMessageContextCommand command : this.messageContextCommands.values()) {
+            commands.add(command.getCommandData());
+        }
+
+        return commands;
+    }
+
+    /*
+        Combine all commands data into one list
+    */
+    public List<CommandData> getAllCommandsData() {
+        List<CommandData> commands = new ArrayList<>();
+
+        commands.addAll(getContextCommandsData());
+        commands.addAll(getCommandsSlashData());
+
+        return commands;
+    }
+
+    public HashMap<String, AiLamaSlashCommand> getSlashCommandMap() {
         return this.slashCommands;
+    }
+
+    public HashMap<String, AiLamaMessageContextCommand> getMessageContextCommandMap() {
+        return this.messageContextCommands;
     }
 
     /*
@@ -68,6 +114,27 @@ public class CommandRegister {
         }
 
         this.slashCommands.put(command.getCommandData().getName(), command);
+
+    }
+
+    /*
+        Add command to the list and enable it to user based on condition
+        if condition is false, command will not be shown to user
+
+        @param command AiLamaUserContextCommand
+        @param condition boolean
+    */
+    public void addCommand(AiLamaMessageContextCommand command, boolean condition) {
+
+        if(!condition) {
+            return;
+        }
+
+        if(this.messageContextCommands.containsKey(command.getCommandData().getName())) {
+            throw new IllegalArgumentException("Command with name " + command.getCommandData().getName() + " already exists");
+        }
+
+        this.messageContextCommands.put(command.getCommandData().getName(), command);
 
     }
 

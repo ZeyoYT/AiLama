@@ -24,6 +24,8 @@ public class JDAReady extends ListenerAdapter {
         LOGGER.info("Guild UnAvailable : " + event.getGuildUnavailableCount());
         System.out.println();
 
-        event.getJDA().updateCommands().addCommands(CommandRegister.getInstance().getCommandsSlashData()).queue();
+        event.getJDA().updateCommands().addCommands(
+                CommandRegister.getInstance().getAllCommandsData()
+        ).queue();
     }
 }

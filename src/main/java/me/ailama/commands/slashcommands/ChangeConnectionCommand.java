@@ -1,9 +1,8 @@
-package me.ailama.commands;
+package me.ailama.commands.slashcommands;
 
 import me.ailama.config.Config;
 import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;
-import me.ailama.main.AiLama;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.IntegrationType;
 import net.dv8tion.jda.api.interactions.InteractionContextType;

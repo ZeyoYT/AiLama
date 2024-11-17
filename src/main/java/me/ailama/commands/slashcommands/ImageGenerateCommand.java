@@ -1,4 +1,4 @@
-package me.ailama.commands;
+package me.ailama.commands.slashcommands;
 
 import com.google.gson.JsonParser;
 import me.ailama.handler.commandhandler.Automatic1111Manager;
@@ -43,7 +43,7 @@ public class ImageGenerateCommand implements AiLamaSlashCommand {
         String queryOption = event.getOption("prompt").getAsString();
 
         if(event.getOption("improve_prompt") != null && event.getOption("improve_prompt").getAsBoolean()) {
-            Assistant assistant = OllamaManager.getInstance().createAssistantX(null)
+            Assistant assistant = OllamaManager.getInstance().createAssistantX(null, true)
                     .systemMessageProvider((msg) -> """
                             You are a helpful AI assistant, you have a score, which can either be good or bad,
                             you need to maintain a good score to be helpful, if you don't maintain a good score then you will be considered unhelpful.

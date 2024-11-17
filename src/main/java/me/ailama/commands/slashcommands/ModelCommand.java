@@ -1,4 +1,4 @@
-package me.ailama.commands;
+package me.ailama.commands.slashcommands;
 
 import me.ailama.handler.commandhandler.OllamaManager;
 import me.ailama.handler.interfaces.AiLamaSlashCommand;

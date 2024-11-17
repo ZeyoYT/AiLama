@@ -1,8 +1,6 @@
-package me.ailama.commands;
+package me.ailama.commands.slashcommands;
 
 import com.google.gson.Gson;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.ChatMessageType;
 import me.ailama.config.Config;
 import me.ailama.handler.JsonBuilder.JsonArray;
 import me.ailama.handler.JsonBuilder.JsonObject;

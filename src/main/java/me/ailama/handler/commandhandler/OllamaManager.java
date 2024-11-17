@@ -314,7 +314,7 @@ public class OllamaManager {
 
         String tools = String.format("tools = %s",OllamaManager.getInstance().getFinalJson().build());
 
-        assistantFromID = createAssistantX(modelOption)
+        assistantFromID = createAssistantX(modelOption, true)
                 .systemMessageProvider(x ->
                         getFormat(tools)
                 )
@@ -433,18 +433,25 @@ public class OllamaManager {
         return chatMemories.get(userId);
     }
 
-    // Returns a custom Assistant that uses the provided model, allowing for more customization, has no memory
-    public AiServices<Assistant> createAssistantX(String modelName) {
+    /*
+        - Returns a custom Assistant that uses the provided model, allowing for more customization, has no memory
+        - providing null for modelName will use the default model
+    */
+    public AiServices<Assistant> createAssistantX(String modelName, boolean json) {
 
         String aiModel = modelName != null ? modelName : model;
 
-        OllamaChatModel ollama = OllamaChatModel.builder()
+        OllamaChatModel.OllamaChatModelBuilder ollamaBuilder = OllamaChatModel.builder()
                 .baseUrl(url)
                 .modelName(aiModel)
                 .temperature(TEMPERATURE)
-                .timeout(Duration.ofSeconds(Config.get("OLLAMA_TIMEOUT_SECONDS") == null ? 60 : Integer.parseInt(Config.get("OLLAMA_TIMEOUT_SECONDS"))))
-                .format("json")
-                .build();
+                .timeout(Duration.ofSeconds(Config.get("OLLAMA_TIMEOUT_SECONDS") == null ? 60 : Integer.parseInt(Config.get("OLLAMA_TIMEOUT_SECONDS"))));
+
+        if(json) {
+            ollamaBuilder.format("json");
+        }
+
+        OllamaChatModel ollama = ollamaBuilder.build();
 
         isTooledAssistant = false;
 

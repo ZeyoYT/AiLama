@@ -1,7 +1,10 @@
 package me.ailama.main;
 
 import me.ailama.autoevents.commandhandler.HandleCommand;
+import me.ailama.autoevents.jdaevents.ButtonEvent;
 import me.ailama.autoevents.jdaevents.JDAReady;
+import me.ailama.autoevents.jdaevents.MenuEvent;
+import me.ailama.autoevents.jdaevents.ModalEvent;
 import me.ailama.config.Config;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -26,7 +29,11 @@ public class Main {
 
                 .addEventListeners(
                         new JDAReady(),
-                        new HandleCommand()
+                        new HandleCommand(),
+
+                        new ModalEvent(),
+                        new ButtonEvent(),
+                        new MenuEvent()
                 )
 
                 .setEnabledIntents(
@@ -35,9 +42,10 @@ public class Main {
                         GatewayIntent.DIRECT_MESSAGES,
                         GatewayIntent.GUILD_VOICE_STATES,
                         GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                        GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
                         GatewayIntent.SCHEDULED_EVENTS,
-                        GatewayIntent.MESSAGE_CONTENT
+                        GatewayIntent.MESSAGE_CONTENT,
+                        GatewayIntent.GUILD_EXPRESSIONS,
+                        GatewayIntent.GUILD_EMOJIS_AND_STICKERS
                 )
 
                 .enableCache(

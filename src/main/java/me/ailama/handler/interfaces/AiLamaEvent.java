@@ -14,7 +14,7 @@ public interface AiLamaEvent {
     }
 
     default void handleButtonEvent(ButtonInteractionEvent event) {
-
+        event.reply(event.getButton().getLabel() + " : Button Clicked").queue();
     }
 
     default void handleEntitySelectEvent(EntitySelectInteractionEvent event) {

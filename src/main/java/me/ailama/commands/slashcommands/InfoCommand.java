@@ -1,9 +1,5 @@
-package me.ailama.commands;
+package me.ailama.commands.slashcommands;
 
-import dev.langchain4j.model.ollama.OllamaChatModel;
-import dev.langchain4j.model.ollama.OllamaModel;
-import dev.langchain4j.model.ollama.OllamaModelDetails;
-import dev.langchain4j.model.ollama.OllamaModels;
 import me.ailama.config.Config;
 import me.ailama.handler.commandhandler.Automatic1111Manager;
 import me.ailama.handler.commandhandler.OllamaManager;
