@@ -41,11 +41,16 @@ public class ReplyCommand implements AiLamaMessageContextCommand, AiLamaEvent {
     @Override
     public void handleCommand(MessageContextInteractionEvent event) {
 
+        if(event.getTarget().getContentRaw().isEmpty()) {
+            event.getHook().sendMessage("Please provide a message to get response, no embeds, images or files").queue();
+            return;
+        }
+
         Modal m = Modal.create(event.getId(), "Reply Formatter")
                 .addComponents(
-                        ActionRow.of(TextInput.create("reply_tone", "Reply Tone", TextInputStyle.SHORT).setRequired(true).build()),
+                        ActionRow.of(TextInput.create("reply_requirements", "Reply Requirements", TextInputStyle.SHORT).setRequired(true).build()),
                         ActionRow.of(TextInput.create("custom_system_message", "Custom System Message", TextInputStyle.PARAGRAPH).setRequired(false).build())
-                )
+                        )
                 .build();
 
         EventManager.getEventManager().addEventWithData(event.getUser().getId(), m.getId(), EventCategoryEnum.ModalEvent, this, event.getTarget());
@@ -57,21 +62,21 @@ public class ReplyCommand implements AiLamaMessageContextCommand, AiLamaEvent {
 
         event.deferReply().queue();
 
-        String tone = event.getValue("reply_tone").getAsString();
+        String tone = event.getValue("reply_requirements").getAsString();
         String customSystemMessage;
 
         if(event.getValue("custom_system_message") != null) {
             customSystemMessage = event.getValue("custom_system_message").getAsString();
 
             customSystemMessage += "\n\n" + """
-                    As your knowledge base was cut off, you may use the following information in json for crafting the reply:
+                    As your knowledge base was cut off, you may use the following information for sending the response:
                     - %s
                     
-                    User requirements for the reply:
-                    - Tone : %s
-                    
-                    Craft the reply for the following message:
+                    User requirements for the response:
                     - %s
+                    
+                    Craft the response for the following message:
+                    - " %s "
                     """;
         } else {
             customSystemMessage = null;
@@ -81,26 +86,28 @@ public class ReplyCommand implements AiLamaMessageContextCommand, AiLamaEvent {
 
         String message = eventData.getContentRaw();
         String SystemMessage = """
+                Act as a helpful and concise assistant. When generating responses to user messages,
+                do not enclose them in quotation marks. Format your responses according to the provided
+                JSON and user requirements.
                 
-                You will craft a reply for the message that user provides, but craft it in a way that it is a reply to the user's message.
+                Here's how you'll receive information:
                 
-                Rules :
-                - don't enclose the message in quotes and make it copy paste ready.
-                - you may use markdown to format your messages.
-                - Reply should look like a reply to a friend.
-                - use common slang and abbreviations.
-                - must be short and concise.
-                - don't use too many emojis.
+                - A message from the user (without quotation marks)
+                - User requirements for the response format
+                - Your task: Craft a response for the given message following the user's requirements
                 
-                As your knowledge base was cut off, you may use the following information in json for crafting the reply:
+                Message from User:
+                - " %s "
+                
+                User requirements for the response:
                 - %s
                 
-                User requirements for the reply:
-                - Tone : %s
-                
-                Craft the reply for the following message:
+                As your knowledge base was cut off, you may use the following information in json for response:
                 - %s
                 
+                Now, please assist the user with their request while adhering to these guidelines. Ensure
+                that your responses do not include quotation marks or any additional characters around the
+                response message.
                 """;
 
         String finalCustomSystemMessage = customSystemMessage;

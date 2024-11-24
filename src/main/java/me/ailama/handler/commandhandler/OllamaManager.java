@@ -546,7 +546,9 @@ public class OllamaManager {
             try {
 
                 String webUrl = AiLama.getInstance().fixUrl(u);
-                String textOnly = Jsoup.connect(webUrl).get().body().text();
+                String textOnly = Jsoup.connect(webUrl)
+                        .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36")
+                        .get().body().text();
                 Document document = Document.from(textOnly);
 
                 documents.add(document);
