@@ -291,7 +291,7 @@ public class OllamaManager {
 
         }
 
-        DocumentSplitter splitter = DocumentSplitters.recursive(500, 0);
+        DocumentSplitter splitter = DocumentSplitters.recursive(1000, 200);
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
         OllamaEmbeddingModel embeddingModel = OllamaEmbeddingModel.builder().baseUrl(url).modelName(this.embeddingModel).build();
 
@@ -495,7 +495,7 @@ public class OllamaManager {
 
         String aiModel = modelName != null ? modelName : model;
 
-        DocumentSplitter splitter = DocumentSplitters.recursive(500, 0);
+        DocumentSplitter splitter = DocumentSplitters.recursive(1000, 200);
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
         OllamaEmbeddingModel embeddingModel = OllamaEmbeddingModel.builder().baseUrl(url).modelName(this.embeddingModel).build();
 
