@@ -24,7 +24,6 @@ import me.ailama.handler.interfaces.Assistant;
 import me.ailama.main.AiLama;
 import me.ailama.main.Main;
 import me.ailama.tools.*;
-import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 
